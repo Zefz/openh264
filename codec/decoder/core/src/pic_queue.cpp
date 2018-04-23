@@ -60,7 +60,6 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa);
 
 
 PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight) {
-  PPicture pPic = NULL;
   int32_t iPicWidth = 0;
   int32_t iPicHeight = 0;
 
@@ -70,7 +69,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   int32_t iChromaSize       = 0;
   CMemoryAlign* pMa = pCtx->pMemAlign;
 
-  pPic = (PPicture) pMa->WelsMallocz (sizeof (SPicture), "PPicture");
+  PPicture pPic = (PPicture) pMa->WelsMallocz (sizeof (SPicture), "PPicture");
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
   memset (pPic, 0, sizeof (SPicture));

@@ -619,7 +619,7 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
     pSlice->iLastDeltaQp = 0;
     WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
     if (uiEosFlag) {
-      RestoreCabacDecEngineToBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
+      RestoreCabacDecEngineToBS (&pCtx->sCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
     }
     return ERR_NONE;
   } else if (0 == uiMbType) { //I4x4
@@ -789,7 +789,7 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
 
   WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
   if (uiEosFlag) {
-    RestoreCabacDecEngineToBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
+    RestoreCabacDecEngineToBS (&pCtx->sCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
   }
   return ERR_NONE;
 }
@@ -839,7 +839,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
       pSlice->iLastDeltaQp = 0;
       WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
       if (uiEosFlag) {
-        RestoreCabacDecEngineToBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
+        RestoreCabacDecEngineToBS (&pCtx->sCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
       }
       return ERR_NONE;
     } else { //normal Intra mode
@@ -1030,7 +1030,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
 
   WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
   if (uiEosFlag) {
-    RestoreCabacDecEngineToBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
+    RestoreCabacDecEngineToBS (&pCtx->sCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux);
   }
 
   return ERR_NONE;
@@ -1181,7 +1181,7 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
     WelsCabacContextInit (pCtx, pSlice->eSliceType, iCabacInitIdc, iQp);
     //InitCabacCtx (pCtx->pCabacCtx, pSlice->eSliceType, iCabacInitIdc, iQp);
     pSlice->iLastDeltaQp = 0;
-    WELS_READ_VERIFY (InitCabacDecEngineFromBS (pCtx->pCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux));
+    WELS_READ_VERIFY (InitCabacDecEngineFromBS (&pCtx->sCabacDecEngine, pCtx->pCurDqLayer->pBitStringAux));
   }
   //try to calculate  the dequant_coeff
   WelsCalcDeqCoeffScalingList (pCtx);

@@ -103,7 +103,7 @@ typedef struct {
 #define NEW_CTX_OFFSET_ABS_8x8  431 // Puzzle, where is the definition?
 
 typedef struct TagDataBuffer {
-  uint8_t* pHead;
+  uint8_t pHead[MIN_ACCESS_UNIT_CAPACITY * MAX_BUFFERED_NUM];
   uint8_t* pEnd;
 
   uint8_t* pStartPos;
@@ -316,7 +316,7 @@ typedef struct TagWelsDecoderContext {
   SPps                          sPpsBuffer[MAX_PPS_COUNT + 1];
   PSliceHeader                  pSliceHeader;
 
-  PPicBuff                      pPicBuff[LIST_A];       // Initially allocated memory for pictures which are used in decoding.
+  SPicBuff                      sPicBuff[LIST_A];       // Initially allocated memory for pictures which are used in decoding.
   int32_t                       iPicQueueNumber;
 
   SSubsetSps                    sSubsetSpsBuffer[MAX_SPS_COUNT + 1];
@@ -328,7 +328,7 @@ typedef struct TagWelsDecoderContext {
   PPps                          pPps;   // used by current AU
 // Memory for pAccessUnitList is dynamically held till decoder destruction.
   PDqLayer                      pCurDqLayer;            // current DQ layer representation, also carry reference base layer if applicable
-  PDqLayer                      pDqLayersList[LAYER_NUM_EXCHANGEABLE];  // DQ layers list with memory allocated
+  SDqLayer                      pDqLayersList[LAYER_NUM_EXCHANGEABLE];  // DQ layers list with memory allocated
 
   int32_t                       iPicWidthReq;             // picture width have requested the memory
   int32_t                       iPicHeightReq;            // picture height have requested the memory
@@ -382,7 +382,7 @@ typedef struct TagWelsDecoderContext {
   SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];
   SSpsBsInfo sSubsetSpsBsInfo [MAX_PPS_COUNT];
   SPpsBsInfo sPpsBsInfo [MAX_PPS_COUNT];
-  SParserBsInfo* pParserBsInfo;
+  SParserBsInfo pParserBsInfo;
 
   PPicture pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   PGetIntraPredFunc pGetI16x16LumaPredFunc[7];          //h264_predict_copy_16x16;
@@ -430,7 +430,7 @@ typedef struct TagWelsDecoderContext {
   SWelsCabacCtx sWelsCabacContexts[4][WELS_QP_MAX + 1][WELS_CONTEXT_COUNT];
   bool bCabacInited;
   SWelsCabacCtx   pCabacCtx[WELS_CONTEXT_COUNT];
-  PWelsCabacDecEngine   pCabacDecEngine;
+  SWelsCabacDecEngine   sCabacDecEngine;
   double dDecTime;
   SDecoderStatistics sDecoderStatistics;// For real time debugging
   int32_t iMbEcedNum;

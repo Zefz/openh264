@@ -47,10 +47,10 @@ namespace WelsDec {
 int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign* pMa) {
   uint32_t uiIdx = 0;
   uint8_t* pBase = NULL, *pPtr = NULL;
-  const uint32_t kuiSizeAu = sizeof (SAccessUnit);
+  static constexpr uint32_t SIZE_AU = sizeof (SAccessUnit);
+  static constexpr uint32_t SIZE_NAL_UNIT = sizeof (SNalUnit);
   const uint32_t kuiSizeNalUnitPtr = kuiSize * sizeof (PNalUnit);
-  const uint32_t kuiSizeNalUnit = sizeof (SNalUnit);
-  const uint32_t kuiCountSize = (kuiSizeAu + kuiSizeNalUnitPtr + kuiSize * kuiSizeNalUnit) * sizeof (uint8_t);
+  const uint32_t kuiCountSize = (SIZE_AU + kuiSizeNalUnitPtr + kuiSize * SIZE_NAL_UNIT) * sizeof (uint8_t);
 
   if (kuiSize == 0)
     return ERR_INFO_INVALID_PARAM;
@@ -64,12 +64,12 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
     return ERR_INFO_OUT_OF_MEMORY;
   pPtr = pBase;
   *ppAu = (PAccessUnit)pPtr;
-  pPtr += kuiSizeAu;
+  pPtr += SIZE_AU;
   (*ppAu)->pNalUnitsList = (PNalUnit*)pPtr;
   pPtr += kuiSizeNalUnitPtr;
   do {
     (*ppAu)->pNalUnitsList[uiIdx] = (PNalUnit)pPtr;
-    pPtr += kuiSizeNalUnit;
+    pPtr += SIZE_NAL_UNIT;
     ++ uiIdx;
   } while (uiIdx < kuiSize);
 

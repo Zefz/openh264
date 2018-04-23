@@ -221,9 +221,9 @@ void CWelsDecoder::UninitDecoder (void) {
   WelsEndDecoder (m_pDecContext);
 
   if (m_pDecContext->pMemAlign != NULL) {
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsDecoder::UninitDecoder(), verify memory usage (%d bytes) after free..",
-             m_pDecContext->pMemAlign->WelsGetMemoryUsage());
+    //WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+    //         "CWelsDecoder::UninitDecoder(), verify memory usage (%d bytes) after free..",
+    //         m_pDecContext->pMemAlign->WelsGetMemoryUsage());
     delete m_pDecContext->pMemAlign;
     m_pDecContext->pMemAlign = NULL;
   }

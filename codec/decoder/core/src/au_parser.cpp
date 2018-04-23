@@ -1178,15 +1178,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
       //re-write subset SPS to SPS
       SBitStringAux sSubsetSpsBs;
-      CMemoryAlign* pMa = pCtx->pMemAlign;
 
-      uint8_t* pBsBuf = static_cast<uint8_t*> (pMa->WelsMallocz (SPS_PPS_BS_SIZE + 4,
-                        "Temp buffer for parse only usage.")); //to reserve 4 bytes for UVLC writing buffer
-      if (NULL == pBsBuf) {
-        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "sps buffer alloc failed for parse only!");
-        pCtx->iErrorCode |= dsOutOfMemory;
-        return pCtx->iErrorCode;
-      }
+      uint8_t pBsBuf[SPS_PPS_BS_SIZE + 4]; //to reserve 4 bytes for UVLC writing buffer
       InitBits (&sSubsetSpsBs, pBsBuf, (int32_t) (pBs->pEndBuf - pBs->pStartBuf));
       BsWriteBits (&sSubsetSpsBs, 8, 77); //profile_idc, forced to Main profile
       BsWriteOneBit (&sSubsetSpsBs, pSps->bConstraintSet0Flag); // constraint_set0_flag
@@ -1230,9 +1223,6 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
       int32_t iRbspSize = (int32_t) (sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf);
       RBSP2EBSP (pSpsBs->pSpsBsBuf + 5, sSubsetSpsBs.pStartBuf, iRbspSize);
       pSpsBs->uiSpsBsLen = (uint16_t) (sSubsetSpsBs.pCurBuf - sSubsetSpsBs.pStartBuf + 5);
-      if (pBsBuf) {
-        pMa->WelsFree (pBsBuf, "pBsBuf for parse only usage");
-      }
     }
   }
   // Check if SPS SVC extension applicated
