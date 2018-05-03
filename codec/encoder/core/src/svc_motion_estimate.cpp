@@ -637,7 +637,7 @@ void WelsMotionCrossSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* p
 // Feature Search Basics
 /////////////////////////
 //memory related
-int32_t RequestFeatureSearchPreparation (CMemoryAlign* pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
+int32_t RequestFeatureSearchPreparation (const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
     const int32_t iNeedFeatureStorage,
     SFeatureSearchPreparation* pFeatureSearchPreparation) {
   const int32_t kiFeatureStrategyIndex = iNeedFeatureStorage >> 16;
@@ -653,7 +653,7 @@ int32_t RequestFeatureSearchPreparation (CMemoryAlign* pMa, const int32_t kiFram
                             (kiFrameWidth - kiMarginSize) * sizeof (uint32_t) + kiFrameWidth * 8 * sizeof (uint8_t);
   }
   pFeatureSearchPreparation->pFeatureOfBlock =
-    (uint16_t*)pMa->WelsMallocz (iListOfFeatureOfBlock, "pFeatureOfBlock");
+    (uint16_t*)WelsMallocz (iListOfFeatureOfBlock, "pFeatureOfBlock");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == (pFeatureSearchPreparation->pFeatureOfBlock))
 
   pFeatureSearchPreparation->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
@@ -663,16 +663,16 @@ int32_t RequestFeatureSearchPreparation (CMemoryAlign* pMa, const int32_t kiFram
 
   return ENC_RETURN_SUCCESS;
 }
-int32_t ReleaseFeatureSearchPreparation (CMemoryAlign* pMa, uint16_t*& pFeatureOfBlock) {
-  if (pMa && pFeatureOfBlock) {
-    pMa->WelsFree (pFeatureOfBlock, "pFeatureOfBlock");
+int32_t ReleaseFeatureSearchPreparation (uint16_t*& pFeatureOfBlock) {
+  if (pFeatureOfBlock) {
+    WelsFree (pFeatureOfBlock, "pFeatureOfBlock");
     pFeatureOfBlock = NULL;
     return ENC_RETURN_SUCCESS;
   }
   return ENC_RETURN_UNEXPECTED;
 }
 
-int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
+int32_t RequestScreenBlockFeatureStorage (const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
     const int32_t iNeedFeatureStorage,
     SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
 
@@ -690,19 +690,19 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   const int32_t kiListSize  = (0 == kiFeatureStrategyIndex) ? (bIsBlock8x8 ? LIST_SIZE_SUM_8x8 : LIST_SIZE_SUM_16x16) :
                               256;
 
-  pScreenBlockFeatureStorage->pTimesOfFeatureValue = (uint32_t*)pMa->WelsMallocz (kiListSize * sizeof (uint32_t),
+  pScreenBlockFeatureStorage->pTimesOfFeatureValue = (uint32_t*)WelsMallocz (kiListSize * sizeof (uint32_t),
       "pScreenBlockFeatureStorage->pTimesOfFeatureValue");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pTimesOfFeatureValue)
 
-  pScreenBlockFeatureStorage->pLocationOfFeature = (uint16_t**)pMa->WelsMallocz (kiListSize * sizeof (uint16_t*),
+  pScreenBlockFeatureStorage->pLocationOfFeature = (uint16_t**)WelsMallocz (kiListSize * sizeof (uint16_t*),
       "pScreenBlockFeatureStorage->pLocationOfFeature");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationOfFeature)
 
-  pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMallocz (2 * kiFrameSize * sizeof (uint16_t),
+  pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)WelsMallocz (2 * kiFrameSize * sizeof (uint16_t),
       "pScreenBlockFeatureStorage->pLocationPointer");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationPointer)
   //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
-  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMallocz (WELS_MAX (LIST_SIZE_SUM_16x16,
+  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)WelsMallocz (WELS_MAX (LIST_SIZE_SUM_16x16,
       LIST_SIZE_MSE_16x16) * sizeof (uint16_t*),
       "pScreenBlockFeatureStorage->pFeatureValuePointerList");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pFeatureValuePointerList)
@@ -716,25 +716,25 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
 
   return ENC_RETURN_SUCCESS;
 }
-int32_t ReleaseScreenBlockFeatureStorage (CMemoryAlign* pMa, SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
-  if (pMa && pScreenBlockFeatureStorage) {
+int32_t ReleaseScreenBlockFeatureStorage (SScreenBlockFeatureStorage* pScreenBlockFeatureStorage) {
+  if (pScreenBlockFeatureStorage) {
     if (pScreenBlockFeatureStorage->pTimesOfFeatureValue) {
-      pMa->WelsFree (pScreenBlockFeatureStorage->pTimesOfFeatureValue, "pScreenBlockFeatureStorage->pTimesOfFeatureValue");
+      WelsFree (pScreenBlockFeatureStorage->pTimesOfFeatureValue, "pScreenBlockFeatureStorage->pTimesOfFeatureValue");
       pScreenBlockFeatureStorage->pTimesOfFeatureValue = NULL;
     }
 
     if (pScreenBlockFeatureStorage->pLocationOfFeature) {
-      pMa->WelsFree (pScreenBlockFeatureStorage->pLocationOfFeature, "pScreenBlockFeatureStorage->pLocationOfFeature");
+      WelsFree (pScreenBlockFeatureStorage->pLocationOfFeature, "pScreenBlockFeatureStorage->pLocationOfFeature");
       pScreenBlockFeatureStorage->pLocationOfFeature = NULL;
     }
 
     if (pScreenBlockFeatureStorage->pLocationPointer) {
-      pMa->WelsFree (pScreenBlockFeatureStorage->pLocationPointer, "pScreenBlockFeatureStorage->pLocationPointer");
+      WelsFree (pScreenBlockFeatureStorage->pLocationPointer, "pScreenBlockFeatureStorage->pLocationPointer");
       pScreenBlockFeatureStorage->pLocationPointer = NULL;
     }
 
     if (pScreenBlockFeatureStorage->pFeatureValuePointerList) {
-      pMa->WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList,
+      WelsFree (pScreenBlockFeatureStorage->pFeatureValuePointerList,
                      "pScreenBlockFeatureStorage->pFeatureValuePointerList");
       pScreenBlockFeatureStorage->pFeatureValuePointerList = NULL;
     }

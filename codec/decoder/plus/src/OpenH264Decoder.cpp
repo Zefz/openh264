@@ -33,8 +33,7 @@ namespace staaker
 ***************************************************************************/
     OpenH264Decoder::OpenH264Decoder ()
             : m_pDecContext{},
-              m_pWelsTrace{},
-              _memoryHandler{ICACHE_LINE_SIZE}
+              m_pWelsTrace{}
     {
 
         m_pWelsTrace.SetCodecInstance (this);
@@ -86,10 +85,7 @@ namespace staaker
 
         //reset decoder context
         m_pDecContext = {};
-
-
-        m_pDecContext.pMemAlign = &_memoryHandler;
-
+        
         //fill in default value into context
         WelsDecoderDefaults (&m_pDecContext, &m_pWelsTrace.m_sLogCtx);
 

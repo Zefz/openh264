@@ -33,21 +33,13 @@
 #pragma once
 
 #include "typedefs.h"
-#include <cstdio>
 #include <memory>
 
+#ifdef __linux__
+#include <iostream>
+#endif
+
 namespace WelsCommon {
-
-class CMemoryAlign {
-public:
-    CMemoryAlign (const uint32_t kuiCacheLineSize);
-
-    void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
-    void WelsFree (void* pPointer, const char* kpTag);
-
-protected:
-    uint32_t        m_nCacheLineSize;
-};
 
 #define  WELS_NEW_OP(object, type)   \
   (type*)(new object);
@@ -56,15 +48,23 @@ protected:
   if(p) delete p;            \
   p = NULL;
 
-static inline void* WelsMallocz(const uint32_t kuiSize, const char* kpTag = nullptr) {
+static inline void* WelsMallocz (const uint32_t kuiSize, const char* kpTag) {
 #ifdef __linux__
-    printf("[%s] zMalloc %ul bytes", kpTag == nullptr ? "unknown" : kpTag, kuiSize);
+    std::cout << "[" << kpTag << "]" << " zMalloc " << kuiSize << " bytes\n";
 #endif
-  return calloc(kuiSize, sizeof(uint8_t));
+
+    /*
+    void* result = aligned_alloc(m_nCacheLineSize, kuiSize);
+    memset(result, 0, kuiSize);
+    return result;
+    */
+
+    return calloc(kuiSize, sizeof(uint8_t));
 }
 
-static inline void WelsFree(void *memory) {
-    free(memory);
+static inline void WelsFree (void* pPointer, const char* kpTag) {
+    free(pPointer);
 }
+
 
 }

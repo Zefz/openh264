@@ -116,7 +116,7 @@ typedef struct TagStrideTables {
 typedef struct TagWelsEncCtx {
   SLogContext sLogCtx;
 // Input
-  SWelsSvcCodingParam* pSvcParam;   // SVC parameter, WelsSVCParamConfig in svc_param_settings.h
+  SWelsSvcCodingParam pSvcParam;   // SVC parameter, WelsSVCParamConfig in svc_param_settings.h
 
   int32_t*          pSadCostMb;
   /* MVD cost tables for Inter MB */
@@ -134,7 +134,7 @@ typedef struct TagWelsEncCtx {
 
   SMB**             ppMbListD;     // [MAX_DEPENDENCY_LAYER];
   SStrideTables*    pStrideTab;     // stride tables for internal coding used
-  SWelsFuncPtrList* pFuncList;
+  SWelsFuncPtrList  pFuncList;
 
   SSliceThreading*  pSliceThreading;
   IWelsTaskManage*  pTaskManage; //was planning to put it under CWelsH264SVCEncoder but it may be updated (lock/no lock) when param is changed
@@ -212,7 +212,6 @@ typedef struct TagWelsEncCtx {
 
   SParaSetOffset    sPSOVector;
   SParaSetOffset*   pPSOVector;
-  CMemoryAlign*     pMemAlign;
 
 #if defined(STAT_OUTPUT)
 // overall stat pData, refer to SStatData in stat.h, in case avc to use stat[0][0]

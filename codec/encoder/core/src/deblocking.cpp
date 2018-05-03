@@ -748,7 +748,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
   SSlice* pSlice      = NULL;
 
   if (pCurLayer->iLoopFilterDisableIdc == 0) {
-    DeblockingFilterFrameAvcbase (pCurLayer, pEnc->pFuncList);
+    DeblockingFilterFrameAvcbase (pCurLayer, &pEnc->pFuncList);
   } else if (pCurLayer->iLoopFilterDisableIdc == 2) {
     int32_t iSliceCount = 0;
     int32_t iSliceIdx   = 0;
@@ -757,7 +757,7 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     do {
       pSlice = pCurLayer->ppSliceInLayer[iSliceIdx];
       assert (NULL != pSlice);
-      DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, pSlice);
+      DeblockingFilterSliceAvcbase (pCurLayer, &pEnc->pFuncList, pSlice);
       ++ iSliceIdx;
     } while (iSliceIdx < iSliceCount);
   }

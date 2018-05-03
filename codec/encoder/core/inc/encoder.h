@@ -61,7 +61,7 @@ void FreeMemorySvc (sWelsEncCtx& ppCtx);
  * \brief    allocate or reallocate the output bs buffer
  * \return:  successful - 0; otherwise none 0 for failed
  */
-int32_t AllocateBsOutputBuffer (CMemoryAlign* pMa, const int32_t iNeededLen, int32_t iOrigLen, const char* kpTag,
+int32_t AllocateBsOutputBuffer (const int32_t iNeededLen, int32_t iOrigLen, const char* kpTag,
                                 uint8_t*& pOutputBuffer);
 //TODO: to finish this function and call it
 

@@ -10,7 +10,6 @@ class ISVCDecoder;
 namespace staaker
 {
     using namespace WelsDec;
-    static constexpr uint32_t ICACHE_LINE_SIZE = 16;   // on chip cache line size in byte
 
 class OpenH264Decoder : public ISVCDecoder {
 public:
@@ -66,7 +65,6 @@ public:
 private:
     SWelsDecoderContext     m_pDecContext;
     welsCodecTrace          m_pWelsTrace;
-    CMemoryAlign            _memoryHandler;
     SDecodingParam          _decodingParameters;
 
     int32_t InitDecoder (const SDecodingParam* pParam);

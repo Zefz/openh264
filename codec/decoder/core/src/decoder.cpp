@@ -57,11 +57,11 @@
 namespace WelsDec {
 
 //Destroy picutre buffer
-static void DestroyPicBuff(SPicBuff& ppPicBuf, CMemoryAlign* pMa);
+static void DestroyPicBuff(SPicBuff& ppPicBuf);
 
 extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
 
-extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
+extern void FreePicture (PPicture pPic);
 
 static int32_t CreatePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuff, const int32_t kiSize,
                               const int32_t kiPicWidth, const int32_t kiPicHeight) {
@@ -70,13 +70,11 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuff, cons
     return ERR_INFO_INVALID_PARAM;
   }
 
-  CMemoryAlign* pMa = pCtx->pMemAlign;
-
-  sPicBuff.ppPic = (PPicture*)pMa->WelsMallocz (kiSize * sizeof (PPicture), "PPicture*");
+  sPicBuff.ppPic = (PPicture*)WelsMallocz (kiSize * sizeof (PPicture), "PPicture*");
 
   if (nullptr == sPicBuff.ppPic) {
     sPicBuff.iCapacity = 0;
-    DestroyPicBuff (sPicBuff, pMa);
+    DestroyPicBuff (sPicBuff);
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
@@ -85,7 +83,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuff, cons
     if (nullptr == pPic) {
       // init capacity first for free memory
       sPicBuff.iCapacity = iPicIdx;
-      DestroyPicBuff (sPicBuff, pMa);
+      DestroyPicBuff (sPicBuff);
       return ERR_INFO_OUT_OF_MEMORY;
     }
     sPicBuff.ppPic[iPicIdx] = pPic;
@@ -110,7 +108,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuf, con
 
   if (nullptr == sPicBuf.ppPic || oldBuffer == sPicBuf.ppPic) {
     sPicBuf.iCapacity = 0;
-    DestroyPicBuff (sPicBuf, pCtx->pMemAlign);
+    DestroyPicBuff (sPicBuf);
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
@@ -120,7 +118,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuf, con
     if (nullptr == pPic) {
       // Set maximum capacity as the new malloc memory at the tail
       sPicBuf.iCapacity = iPicIdx;
-      DestroyPicBuff (sPicBuf, pCtx->pMemAlign);
+      DestroyPicBuff (sPicBuf);
       return ERR_INFO_OUT_OF_MEMORY;
     }
     sPicBuf.ppPic[iPicIdx] = pPic;
@@ -146,8 +144,6 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx,  SPicBuff& sPicBuf, co
     return ERR_INFO_INVALID_PARAM;
   }
 
-  CMemoryAlign* pMa = pCtx->pMemAlign;
-
   int32_t iPrevPicIdx;
   for (iPrevPicIdx = 0; iPrevPicIdx < kiOldSize; ++iPrevPicIdx) {
     if (pCtx->pPreviousDecodedPictureInDpb == sPicBuf.ppPic[iPrevPicIdx]) {
@@ -161,7 +157,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx,  SPicBuff& sPicBuf, co
   for (iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
     if (iPrevPicIdx != iPicIdx) {
       if (sPicBuf.ppPic[iPicIdx] != nullptr) {
-        FreePicture (sPicBuf.ppPic[iPicIdx], pMa);
+        FreePicture (sPicBuf.ppPic[iPicIdx]);
         sPicBuf.ppPic[iPicIdx] = nullptr;
       }
     }
@@ -183,19 +179,19 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx,  SPicBuff& sPicBuf, co
   return ERR_NONE;
 }
 
-static void DestroyPicBuff(SPicBuff &sPicBuff, CMemoryAlign* pMa) {
+static void DestroyPicBuff(SPicBuff &sPicBuff) {
 
   if(sPicBuff.ppPic != nullptr) {
     int32_t iPicIdx = 0;
     while (iPicIdx < sPicBuff.iCapacity) {
       PPicture pPic = sPicBuff.ppPic[iPicIdx];
       if (pPic != nullptr) {
-        FreePicture (pPic, pMa);
+        FreePicture (pPic);
       }
       ++ iPicIdx;
     }
 
-    pMa->WelsFree (sPicBuff.ppPic, "pPicBuf->queue");
+    WelsFree (sPicBuff.ppPic, "pPicBuf->queue");
 
     sPicBuff.ppPic = nullptr;
   }
@@ -297,7 +293,6 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   int32_t iPicQueueSize         = 0;    // adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
   bReallocFlag                  = false;
   bool  bNeedChangePicQueue     = true;
-  CMemoryAlign* pMa = pCtx->pMemAlign;
 
   WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pCtx || kiPicWidth <= 0 || kiPicHeight <= 0))
 
@@ -338,7 +333,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
                kiPicWidth, kiPicHeight, iPicQueueSize);
     // for Recycled_Pic_Queue
     for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
-      DestroyPicBuff (pCtx->sPicBuff[iListIdx], pMa);
+      DestroyPicBuff (pCtx->sPicBuff[iListIdx]);
     }
 
     pCtx->pPreviousDecodedPictureInDpb = NULL;
@@ -366,7 +361,6 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
  */
 void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   int32_t iListIdx = 0;
-  CMemoryAlign* pMa = pCtx->pMemAlign;
 
   //free dq layer memory
   UninitialDqLayersContext (pCtx);
@@ -377,7 +371,7 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   //free ref-pic list & picture memory
   WelsResetRefPic (pCtx);
   for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
-    DestroyPicBuff (pCtx->sPicBuff[iListIdx], pMa);
+    DestroyPicBuff (pCtx->sPicBuff[iListIdx]);
   }
 
   // added for safe memory

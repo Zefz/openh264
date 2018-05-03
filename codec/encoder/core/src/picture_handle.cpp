@@ -48,7 +48,7 @@ namespace WelsEnc {
  * \pram    need_expand     need borders expanding
  * \return  successful if effective picture pointer returned, otherwise failed with NULL
  */
-SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t kiHeight,
+SPicture* AllocPicture (const int32_t kiWidth , const int32_t kiHeight,
                         bool bNeedMbInfo, int32_t iNeedFeatureStorage) {
   SPicture* pPic = NULL;
   int32_t iPicWidth = 0;
@@ -59,7 +59,7 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   int32_t iLumaSize             = 0;
   int32_t iChromaSize           = 0;
 
-  pPic = static_cast<SPicture*> (pMa->WelsMallocz (sizeof (SPicture), "pPic"));
+  pPic = static_cast<SPicture*> (WelsMallocz (sizeof (SPicture), "pPic"));
 
   WELS_VERIFY_RETURN_IF (NULL, NULL == pPic);
 
@@ -73,10 +73,10 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   iLumaSize         = iPicWidth * iPicHeight;
   iChromaSize       = iPicChromaWidth * iPicChromaHeight;
 
-  pPic->pBuffer = (uint8_t*)pMa->WelsMallocz (iLumaSize /* luma */
+  pPic->pBuffer = (uint8_t*)WelsMallocz (iLumaSize /* luma */
                   + (iChromaSize << 1) /* Cb,Cr */
                   , "pPic->pBuffer");
-  WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer, FreePicture (pMa, &pPic));
+  WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer, FreePicture (&pPic));
   pPic->iLineSize[0]    = iPicWidth;
   pPic->iLineSize[1]    = pPic->iLineSize[2]    = iPicChromaWidth;
   pPic->pData[0]        = pPic->pBuffer + (1 + pPic->iLineSize[0]) * PADDING_LENGTH;
@@ -95,26 +95,26 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   if (bNeedMbInfo) {
     const uint32_t kuiCountMbNum = ((15 + kiWidth) >> 4) * ((15 + kiHeight) >> 4);
 
-    pPic->uiRefMbType = (uint32_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint32_t), "pPic->uiRefMbType");
-    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->uiRefMbType, FreePicture (pMa, &pPic));
+    pPic->uiRefMbType = (uint32_t*)WelsMallocz (kuiCountMbNum * sizeof (uint32_t), "pPic->uiRefMbType");
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->uiRefMbType, FreePicture (&pPic));
 
-    pPic->pRefMbQp = (uint8_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (uint8_t), "pPic->pRefMbQp");
-    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pRefMbQp, FreePicture (pMa, &pPic));
+    pPic->pRefMbQp = (uint8_t*)WelsMallocz (kuiCountMbNum * sizeof (uint8_t), "pPic->pRefMbQp");
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pRefMbQp, FreePicture (&pPic));
 
-    pPic->sMvList           = static_cast<SMVUnitXY*> (pMa->WelsMallocz (kuiCountMbNum * sizeof (SMVUnitXY),
+    pPic->sMvList           = static_cast<SMVUnitXY*> (WelsMallocz (kuiCountMbNum * sizeof (SMVUnitXY),
                               "pPic->sMvList"));
-    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->sMvList, FreePicture (pMa, &pPic));
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->sMvList, FreePicture (&pPic));
 
-    pPic->pMbSkipSad       = (int32_t*)pMa->WelsMallocz (kuiCountMbNum * sizeof (int32_t), "pPic->pMbSkipSad");
-    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pMbSkipSad, FreePicture (pMa, &pPic));
+    pPic->pMbSkipSad       = (int32_t*)WelsMallocz (kuiCountMbNum * sizeof (int32_t), "pPic->pMbSkipSad");
+    WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pMbSkipSad, FreePicture (&pPic));
   }
 
   if (iNeedFeatureStorage) {
-    pPic->pScreenBlockFeatureStorage = static_cast<SScreenBlockFeatureStorage*> (pMa->WelsMallocz (sizeof (
+    pPic->pScreenBlockFeatureStorage = static_cast<SScreenBlockFeatureStorage*> (WelsMallocz (sizeof (
                                          SScreenBlockFeatureStorage), "pScreenBlockFeatureStorage"));
-    int32_t iReturn = RequestScreenBlockFeatureStorage (pMa, kiWidth,  kiHeight, iNeedFeatureStorage,
+    int32_t iReturn = RequestScreenBlockFeatureStorage (kiWidth,  kiHeight, iNeedFeatureStorage,
                       pPic->pScreenBlockFeatureStorage);
-    WELS_VERIFY_RETURN_PROC_IF (NULL, ENC_RETURN_SUCCESS != iReturn, FreePicture (pMa, &pPic));
+    WELS_VERIFY_RETURN_PROC_IF (NULL, ENC_RETURN_SUCCESS != iReturn, FreePicture (&pPic));
   } else {
     pPic->pScreenBlockFeatureStorage = NULL;
   }
@@ -126,12 +126,12 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
  * \param   pPic        picture pointer to be destoryed
  * \return  none
  */
-void FreePicture (CMemoryAlign* pMa, SPicture** ppPic) {
+void FreePicture (SPicture** ppPic) {
   if (NULL != ppPic && NULL != *ppPic) {
     SPicture* pPic = *ppPic;
 
     if (NULL != pPic->pBuffer) {
-      pMa->WelsFree (pPic->pBuffer, "pPic->pBuffer");
+      WelsFree (pPic->pBuffer, "pPic->pBuffer");
       pPic->pBuffer = NULL;
     }
     pPic->pBuffer          = NULL;
@@ -152,30 +152,30 @@ void FreePicture (CMemoryAlign* pMa, SPicture** ppPic) {
     pPic->iMarkFrameNum         = -1;
 
     if (pPic->uiRefMbType) {
-      pMa->WelsFree (pPic->uiRefMbType, "pPic->uiRefMbType");
+      WelsFree (pPic->uiRefMbType, "pPic->uiRefMbType");
       pPic->uiRefMbType = NULL;
     }
     if (pPic->pRefMbQp) {
-      pMa->WelsFree (pPic->pRefMbQp, "pPic->pRefMbQp");
+      WelsFree (pPic->pRefMbQp, "pPic->pRefMbQp");
       pPic->pRefMbQp = NULL;
     }
 
     if (pPic->sMvList) {
-      pMa->WelsFree (pPic->sMvList, "pPic->sMvList");
+      WelsFree (pPic->sMvList, "pPic->sMvList");
       pPic->sMvList = NULL;
     }
     if (pPic->pMbSkipSad) {
-      pMa->WelsFree (pPic->pMbSkipSad, "pPic->pMbSkipSad");
+      WelsFree (pPic->pMbSkipSad, "pPic->pMbSkipSad");
       pPic->pMbSkipSad = NULL;
     }
 
     if (pPic->pScreenBlockFeatureStorage) {
-      ReleaseScreenBlockFeatureStorage (pMa, pPic->pScreenBlockFeatureStorage);
-      pMa->WelsFree (pPic->pScreenBlockFeatureStorage, "pPic->pScreenBlockFeatureStorage");
+      ReleaseScreenBlockFeatureStorage (pPic->pScreenBlockFeatureStorage);
+      WelsFree (pPic->pScreenBlockFeatureStorage, "pPic->pScreenBlockFeatureStorage");
       pPic->pScreenBlockFeatureStorage = NULL;
     }
 
-    pMa->WelsFree (*ppPic, "pPic");
+    WelsFree (*ppPic, "pPic");
     *ppPic = NULL;
   }
 }

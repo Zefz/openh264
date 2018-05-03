@@ -53,7 +53,7 @@ void WelsDctMb (int16_t* pRes, uint8_t* pEncMb, int32_t iEncStride, uint8_t* pBe
 
 void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   ENFORCE_STACK_ALIGN_1D (int16_t, aDctT4Dc, 16, 16)
-  SWelsFuncPtrList* pFuncList   = pEncCtx->pFuncList;
+  SWelsFuncPtrList* pFuncList   = &pEncCtx->pFuncList;
   SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
   const int32_t kiEncStride     = pCurDqLayer->iEncStride[0];
   int16_t* pRes                 = pMbCache->pCoeffLevel;
@@ -68,7 +68,7 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   const int16_t* pMF = g_kiQuantMF[uiQp];
   const int16_t* pFF = g_iQuantIntraFF[uiQp];
 
-  WelsDctMb (pRes,  pMbCache->SPicData.pEncMb[0], kiEncStride, pBestPred, pEncCtx->pFuncList->pfDctFourT4);
+  WelsDctMb (pRes,  pMbCache->SPicData.pEncMb[0], kiEncStride, pBestPred, pEncCtx->pFuncList.pfDctFourT4);
 
   pFuncList->pfTransformHadamard4x4Dc (aDctT4Dc, pRes);
   pFuncList->pfQuantizationDc4x4 (aDctT4Dc, pFF[0] << 1, pMF[0]>>1);
@@ -137,7 +137,7 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   }
 }
 void WelsEncRecI4x4Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, uint8_t uiI4x4Idx) {
-  SWelsFuncPtrList* pFuncList   = pEncCtx->pFuncList;
+  SWelsFuncPtrList* pFuncList   = &pEncCtx->pFuncList;
   SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
   int32_t iEncStride            = pCurDqLayer->iEncStride[0];
   uint8_t uiQp                  = pCurMb->uiLumaQp;
@@ -336,13 +336,13 @@ bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   const int16_t* pFF = g_kiQuantInterFF[kuiQp];
 
   for (i = 0; i < 4; i++) {
-    pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
+    pEncCtx->pFuncList.pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
       if (aMax[j] > 1) return false; // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
-        pEncCtx->pFuncList->pfScan4x4 (pBlock, pRes); //
-        iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);
+        pEncCtx->pFuncList.pfScan4x4 (pBlock, pRes); //
+        iSingleCtrMb += pEncCtx->pFuncList.pfCalculateSingleCtr4x4 (pBlock);
       }
       if (iSingleCtrMb >= 6) return false; //from JVT-O079
       pRes += 16;
@@ -361,19 +361,19 @@ bool    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, i
   const int16_t* pMF = g_kiQuantMF[kuiQp];
   const int16_t* pFF = g_kiQuantInterFF[kuiQp];
 
-  if (pEncCtx->pFuncList->pfQuantizationHadamard2x2Skip (pRes, pFF[0] << 1, pMF[0]>>1))
+  if (pEncCtx->pFuncList.pfQuantizationHadamard2x2Skip (pRes, pFF[0] << 1, pMF[0]>>1))
     return false;
   else {
     uint16_t aMax[4], j;
     int32_t iSingleCtrMb = 0;
     int16_t* pBlock = pMbCache->pDct->iChromaBlock[ (iUV - 1) << 2];
-    pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
+    pEncCtx->pFuncList.pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
       if (aMax[j] > 1) return false;   // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
-        pEncCtx->pFuncList->pfScan4x4Ac (pBlock, pRes);
-        iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);
+        pEncCtx->pFuncList.pfScan4x4Ac (pBlock, pRes);
+        iSingleCtrMb += pEncCtx->pFuncList.pfCalculateSingleCtr4x4 (pBlock);
       }
       if (iSingleCtrMb >= 7) return false; //from JVT-O079
       pRes += 16;

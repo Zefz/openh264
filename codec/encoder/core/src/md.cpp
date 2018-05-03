@@ -498,7 +498,7 @@ bool MdIntraAnalysisVaaInfo (sWelsEncCtx* pEncCtx, uint8_t* pEncMb) {
 
   SDqLayer* pCurDqLayer     = pEncCtx->pCurDqLayer;
   const int32_t kiLineSize  = pCurDqLayer->iEncStride[0];
-  const int32_t kiVariance  = pEncCtx->pFuncList->pfGetVarianceFromIntraVaa (pEncMb, kiLineSize);
+  const int32_t kiVariance  = pEncCtx->pFuncList.pfGetVarianceFromIntraVaa (pEncMb, kiLineSize);
   return (kiVariance >= INTRA_VARIANCE_SAD_THRESHOLD);
 }
 
@@ -574,7 +574,7 @@ inline void MeRefineQuarPixel (SWelsFuncPtrList* pFunc, SWelsME* pMe, SMeRefineP
 
 void MeRefineFracPixel (sWelsEncCtx* pEncCtx, uint8_t* pMemPredInterMb, SWelsME* pMe,
                         SMeRefinePointer* pMeRefine, int32_t iWidth, int32_t iHeight) {
-  SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
+  SWelsFuncPtrList* pFunc = &pEncCtx->pFuncList;
   int16_t iMvx = pMe->sMv.iMvX;
   int16_t iMvy = pMe->sMv.iMvY;
 

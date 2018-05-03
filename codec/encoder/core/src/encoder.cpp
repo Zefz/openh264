@@ -156,7 +156,7 @@ void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackground
  */
 int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, uint32_t uiCpuFlag) {
   int32_t iReturn = ENC_RETURN_SUCCESS;
-  SWelsFuncPtrList* pFuncList = pEncCtx->pFuncList;
+  SWelsFuncPtrList* pFuncList = &pEncCtx->pFuncList;
   bool bScreenContent = (SCREEN_CONTENT_REAL_TIME == pParam->iUsageType);
 
   /* Functionality utilization of CPU instructions dependency */
@@ -230,7 +230,7 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
 }
 
 void UpdateFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
-  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam.sDependencyLayers[kiDidx];
   bool bNeedFrameNumIncreasing = false;
 
   if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[kiDidx]) {
@@ -249,7 +249,7 @@ void UpdateFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
 
 
 void LoadBackFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
-  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam.sDependencyLayers[kiDidx];
   bool bNeedFrameNumIncreasing = false;
 
   if (NRI_PRI_LOWEST != pEncCtx->eLastNalPriority[kiDidx]) {
@@ -277,7 +277,7 @@ void InitBitStream (sWelsEncCtx* pEncCtx) {
  * \brief   initialize frame coding
  */
 void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, const int32_t kiDidx) {
-  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam.sDependencyLayers[kiDidx];
   if (keFrameType == videoFrameTypeP) {
     ++pParamInternal->iFrameIndex;
 
@@ -332,31 +332,31 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, c
 
 EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx,
                                  bool bSkipFrameFlag) {
-  SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
-  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
+  SWelsSvcCodingParam& pSvcParam = pEncCtx->pSvcParam;
+  SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam.sDependencyLayers[kiDidx];
   EVideoFrameType iFrameType = videoFrameTypeInvalid;
   bool bSceneChangeFlag = false;
-  if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-    if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
-        (kiSpatialNum < pSvcParam->iSpatialLayerNum)) {
+  if (pSvcParam.iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    if ((!pSvcParam.bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
+        (kiSpatialNum < pSvcParam.iSpatialLayerNum)) {
       bSceneChangeFlag = false;
     } else {
       bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
     }
-    if (pEncCtx->pVaa->bIdrPeriodFlag || pParamInternal->bEncCurFrmAsIdrFlag || (!pSvcParam->bEnableLongTermReference
+    if (pEncCtx->pVaa->bIdrPeriodFlag || pParamInternal->bEncCurFrmAsIdrFlag || (!pSvcParam.bEnableLongTermReference
         && bSceneChangeFlag && !bSkipFrameFlag)) {
       iFrameType = videoFrameTypeIDR;
-    } else if (pSvcParam->bEnableLongTermReference && (bSceneChangeFlag
+    } else if (pSvcParam.bEnableLongTermReference && (bSceneChangeFlag
                || pEncCtx->pVaa->eSceneChangeIdc == LARGE_CHANGED_SCENE)) {
       int iActualLtrcount = 0;
       SPicture** pLongTermRefList = pEncCtx->ppRefPicListExt[0]->pLongRefList;
-      for (int i = 0; i < pSvcParam->iLTRRefNum; ++i) {
+      for (int i = 0; i < pSvcParam.iLTRRefNum; ++i) {
         if (NULL != pLongTermRefList[i] && pLongTermRefList[i]->bUsedAsRef && pLongTermRefList[i]->bIsLongRef
             && pLongTermRefList[i]->bIsSceneLTR) {
           ++iActualLtrcount;
         }
       }
-      if (iActualLtrcount == pSvcParam->iLTRRefNum && bSceneChangeFlag) {
+      if (iActualLtrcount == pSvcParam.iLTRRefNum && bSceneChangeFlag) {
         iFrameType = videoFrameTypeIDR;
       } else {
         iFrameType = videoFrameTypeP;
@@ -374,15 +374,15 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
 
   } else {
     // perform scene change detection
-    if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
-        (kiSpatialNum < pSvcParam->iSpatialLayerNum)
+    if ((!pSvcParam.bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
+        (kiSpatialNum < pSvcParam.iSpatialLayerNum)
         || (pParamInternal->iFrameIndex < (VGOP_SIZE << 1))) { // avoid too frequent I frame coding, rc control
       bSceneChangeFlag = false;
     } else {
       bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
     }
 
-    //scene_changed_flag: RC enable && iSpatialNum == pSvcParam->iSpatialLayerNum
+    //scene_changed_flag: RC enable && iSpatialNum == pSvcParam.iSpatialLayerNum
     //bIdrPeriodFlag: RC disable || iSpatialNum != pSvcParam->iSpatialLayerNum
     //pEncCtx->bEncCurFrmAsIdrFlag: 1. first frame should be IDR; 2. idr pause; 3. idr request
     iFrameType = (pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag

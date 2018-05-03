@@ -726,7 +726,7 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
     if (uiMbType != MB_TYPE_INTRA16x16) {
       WelsCabacMbCbp (pCurMb, iMbWidth, pCabacCtx);
     }
-    iRet = WelsWriteMbResidualCabac (pEncCtx->pFuncList, pSlice, pMbCache, pCurMb, pCabacCtx, iMbWidth,
+    iRet = WelsWriteMbResidualCabac (&pEncCtx->pFuncList, pSlice, pMbCache, pCurMb, pCabacCtx, iMbWidth,
                                      uiChromaQpIndexOffset);
   }
   if (!IS_INTRA (pCurMb->uiMbType))

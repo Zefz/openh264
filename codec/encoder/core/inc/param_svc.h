@@ -536,29 +536,6 @@ typedef struct TagExistingParasetList {
   uint32_t            uiInUsePpsNum;
 } SExistingParasetList;
 
-
-static inline int32_t FreeCodingParam (SWelsSvcCodingParam** pParam, CMemoryAlign* pMa) {
-  if (pParam == NULL || *pParam == NULL || pMa == NULL)
-    return 1;
-  pMa->WelsFree (*pParam, "SWelsSvcCodingParam");
-  *pParam = NULL;
-  return 0;
-}
-
-static inline int32_t AllocCodingParam (SWelsSvcCodingParam** pParam, CMemoryAlign* pMa) {
-  if (pParam == NULL || pMa == NULL)
-    return 1;
-  if (*pParam != NULL) {
-    FreeCodingParam (pParam, pMa);
-  }
-  SWelsSvcCodingParam* pCodingParam = (SWelsSvcCodingParam*)pMa->WelsMallocz (sizeof (SWelsSvcCodingParam),
-                                      "SWelsSvcCodingParam");
-  if (NULL == pCodingParam)
-    return 1;
-  *pParam = pCodingParam;
-  return 0;
-}
-
 }//end of namespace WelsEnc
 
 #endif//WELS_ENCODER_PARAMETER_SVC_H__

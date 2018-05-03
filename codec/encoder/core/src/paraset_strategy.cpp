@@ -87,18 +87,18 @@ static int32_t WelsGenerateNewSps (sWelsEncCtx* pCtx, const bool kbUseSubsetSps,
     pSps        = &pSubsetSps->pSps;
   }
 
-  SWelsSvcCodingParam* pParam = pCtx->pSvcParam;
-  SSpatialLayerConfig* pDlayerParam = &pParam->sSpatialLayers[iDlayerIndex];
+  SWelsSvcCodingParam& pParam = pCtx->pSvcParam;
+  SSpatialLayerConfig* pDlayerParam = &pParam.sSpatialLayers[iDlayerIndex];
   // Need port pSps/pPps initialization due to spatial scalability changed
   if (!kbUseSubsetSps) {
-    iRet = WelsInitSps (pSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
-                        pParam->iMaxNumRefFrame,
-                        kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount,
+    iRet = WelsInitSps (pSps, pDlayerParam, &pParam.sDependencyLayers[iDlayerIndex], pParam.uiIntraPeriod,
+                        pParam.iMaxNumRefFrame,
+                        kiSpsId, pParam.bEnableFrameCroppingFlag, pParam.iRCMode != RC_OFF_MODE, iDlayerCount,
                         bSVCBaselayer);
   } else {
-    iRet = WelsInitSubsetSps (pSubsetSps, pDlayerParam, &pParam->sDependencyLayers[iDlayerIndex], pParam->uiIntraPeriod,
-                              pParam->iMaxNumRefFrame,
-                              kiSpsId, pParam->bEnableFrameCroppingFlag, pParam->iRCMode != RC_OFF_MODE, iDlayerCount);
+    iRet = WelsInitSubsetSps (pSubsetSps, pDlayerParam, &pParam.sDependencyLayers[iDlayerIndex], pParam.uiIntraPeriod,
+                              pParam.iMaxNumRefFrame,
+                              kiSpsId, pParam.bEnableFrameCroppingFlag, pParam.iRCMode != RC_OFF_MODE, iDlayerCount);
   }
   return iRet;
 }
@@ -478,7 +478,7 @@ uint32_t CWelsParametersetSpsListing::GenerateNewSps (sWelsEncCtx* pCtx, const b
     const int32_t iDlayerCount, uint32_t kuiSpsId,
     SWelsSPS*& pSps, SSubsetSps*& pSubsetSps, bool bSvcBaselayer) {
   //check if the current param can fit in an existing SPS
-  const int32_t kiFoundSpsId = FindExistingSps (pCtx->pSvcParam, kbUseSubsetSps, iDlayerIndex, iDlayerCount,
+  const int32_t kiFoundSpsId = FindExistingSps (&pCtx->pSvcParam, kbUseSubsetSps, iDlayerIndex, iDlayerCount,
                                kbUseSubsetSps ? (m_sParaSetOffset.uiInUseSubsetSpsNum) : (m_sParaSetOffset.uiInUseSpsNum),
                                pCtx->pSpsArray,
                                pCtx->pSubsetArray, bSvcBaselayer);

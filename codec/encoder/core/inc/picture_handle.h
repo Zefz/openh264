@@ -52,7 +52,7 @@ namespace WelsEnc {
  * \pram    iNeedFeatureStorage     need storage for FME
  * \return  successful if effective picture pointer returned, otherwise failed with NULL
  */
-SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth, const int32_t kiHeight, bool bNeedMbInfo,
+SPicture* AllocPicture (const int32_t kiWidth, const int32_t kiHeight, bool bNeedMbInfo,
                         int32_t iNeedFeatureStorage);
 
 /*!
@@ -60,7 +60,7 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth, const int32_t 
  * \param   pic     picture pointer to be destoryed
  * \return  none
  */
-void FreePicture (CMemoryAlign* pMa, SPicture** ppPic);
+void FreePicture (SPicture** ppPic);
 
 }
 #endif//WELS_ENCODER_PICTURE_HANDLE_H__

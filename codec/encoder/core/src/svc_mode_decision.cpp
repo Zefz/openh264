@@ -67,7 +67,7 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
   bool bKeepSkip = kbMbLeftAvailPskip & kbMbTopAvailPskip & kbMbTopRightAvailPskip;
   bool bSkip = false;
 
-  if (pEncCtx->pFuncList->pfInterMdBackgroundDecision (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, &bKeepSkip)) {
+  if (pEncCtx->pFuncList.pfInterMdBackgroundDecision (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, &bKeepSkip)) {
     return;
   }
 
@@ -84,14 +84,14 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
       PredictSad (pMbCache->sMvComponents.iRefIndexCache, pMbCache->iSadCost, 0, &pWelsMd->iSadPredMb);
 
       //step 2: P_16x16
-      pWelsMd->iCostLuma = WelsMdP16x16 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, pCurMb);
+      pWelsMd->iCostLuma = WelsMdP16x16 (&pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, pCurMb);
       pCurMb->uiMbType = MB_TYPE_16x16;
     }
 
     WelsMdInterSecondaryModesEnc (pEncCtx, pWelsMd, pSlice, pCurMb, pMbCache, bSkip);
   } else { //BLMODE == SVC_INTRA
     //initial prediction memory for I_16x16
-    const int32_t kiCostI16x16 = WelsMdI16x16 (pEncCtx->pFuncList, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
+    const int32_t kiCostI16x16 = WelsMdI16x16 (&pEncCtx->pFuncList, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
     if (bSkip && (pWelsMd->iCostLuma <= kiCostI16x16)) {
       WelsMdInterDecidedPskip (pEncCtx,  pSlice,  pCurMb, pMbCache);
     } else {
@@ -174,7 +174,7 @@ bool CheckChromaCost (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMbCache* pMbCache
 #define KNOWN_CHROMA_TOO_LARGE 640
 #define SMALLEST_INVISIBLE 128 //2*64, 2 in pixel maybe the smallest not visible for luma
 
-  PSampleSadSatdCostFunc* pSad = pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad;
+  PSampleSadSatdCostFunc* pSad = pEncCtx->pFuncList.sSampleDealingFuncs.pfSampleSad;
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 
   uint8_t* pCbEnc = pMbCache->SPicData.pEncMb[1];
@@ -328,7 +328,7 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
   bool bTryStaticSkip = IsMbCollocatedStatic (pWelsMd->iBlock8x8StaticIdc);
   if (bTryStaticSkip) {
     int32_t iStrideUV, iOffsetUV;
-    SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
+    SWelsFuncPtrList* pFunc = &pEncCtx->pFuncList;
     SPicture* pRefOri = pCurDqLayer->pRefOri[0];
     if (pRefOri != NULL) {
       iStrideUV = pCurDqLayer->iEncStride[1];
@@ -365,7 +365,7 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
 
   if (bTryScrollSkip) {
     int32_t iStrideUV, iOffsetUV;
-    SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
+    SWelsFuncPtrList* pFunc = &pEncCtx->pFuncList;
     SPicture* pRefOri = pCurDqLayer->pRefOri[0];
     if (pRefOri != NULL) {
       int32_t iScrollMvX = pVaaExt->sScrollDetectInfo.iScrollMvX;
@@ -393,7 +393,7 @@ void SvcMdSCDMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
                     bool bQpSimilarFlag,
                     bool bMbSkipFlag, SMVUnitXY sCurMbMv[], ESkipModes eSkipMode) {
   SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
-  SWelsFuncPtrList* pFunc       = pEncCtx->pFuncList;
+  SWelsFuncPtrList* pFunc       = &pEncCtx->pFuncList;
   SMVUnitXY sMvp = { 0};
   ST16 (&sMvp.iMvX, sCurMbMv[eSkipMode].iMvX);
   ST16 (&sMvp.iMvY, sCurMbMv[eSkipMode].iMvY);
@@ -437,7 +437,7 @@ void SvcMdSCDMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
     ST32 (pCurMb->pRefIndex, 0);
     pFunc->pfUpdateMbMv (pCurMb->sMv, sMvp);
     pCurMb->uiMbType = MB_TYPE_SKIP;
-    WelsRecPskip (pCurDqLayer, pEncCtx->pFuncList, pCurMb, pMbCache);
+    WelsRecPskip (pCurDqLayer, &pEncCtx->pFuncList, pCurMb, pMbCache);
     WelsMdInterUpdatePskip (pCurDqLayer, pSlice, pCurMb, pMbCache);
     return;
   }
@@ -614,13 +614,13 @@ void WelsMdInterFinePartitionVaaOnScreen (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd
   SMbCache* pMbCache = &pSlice->sMbCacheInfo;
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
   int32_t iCostP8x8;
-  uint8_t uiMbSign = pEncCtx->pFuncList->pfGetMbSignFromInterVaa (&pEncCtx->pVaa->sVaaCalcInfo.pSad8x8[pCurMb->iMbXY][0]);
+  uint8_t uiMbSign = pEncCtx->pFuncList.pfGetMbSignFromInterVaa (&pEncCtx->pVaa->sVaaCalcInfo.pSad8x8[pCurMb->iMbXY][0]);
 
   if (MBVAASIGN_FLAT == uiMbSign) {
     return;
   }
 
-  iCostP8x8 = WelsMdP8x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
+  iCostP8x8 = WelsMdP8x8 (&pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
   if (iCostP8x8 < iBestCost) {
     iBestCost = iCostP8x8;
     pCurMb->uiMbType = MB_TYPE_8x8;

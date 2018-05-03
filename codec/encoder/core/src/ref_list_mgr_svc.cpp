@@ -69,9 +69,9 @@ void WelsResetRefList (sWelsEncCtx* pCtx) {
 
   for (i = 0; i < MAX_SHORT_REF_COUNT + 1; i++)
     pRefList->pShortRefList[i] = NULL;
-  for (i = 0; i < pCtx->pSvcParam->iLTRRefNum + 1; i++)
+  for (i = 0; i < pCtx->pSvcParam.iLTRRefNum + 1; i++)
     pRefList->pLongRefList[i] = NULL;
-  for (i = 0; i < pCtx->pSvcParam->iNumRefFrame + 1; i++)
+  for (i = 0; i < pCtx->pSvcParam.iNumRefFrame + 1; i++)
     pRefList->pRef[i]->SetUnref();
 
   pRefList->uiLongRefCount = 0;
@@ -103,7 +103,7 @@ static inline void DeleteSTRFromShortList (sWelsEncCtx* pCtx, int32_t iIdx) {
 }
 static void DeleteNonSceneLTR (sWelsEncCtx* pCtx) {
   SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
-  for (int32_t i = 0; i < pCtx->pSvcParam->iNumRefFrame; ++i) {
+  for (int32_t i = 0; i < pCtx->pSvcParam.iNumRefFrame; ++i) {
     SPicture* pRef = pRefList->pLongRefList[i];
     if (pRef != NULL &&  pRef->bUsedAsRef && pRef->bIsLongRef && (!pRef->bIsSceneLTR) &&
         (pCtx->uiTemporalId < pRef->uiTemporalId || pCtx->bCurFrameMarkedAsSceneLtr)) {
@@ -155,7 +155,7 @@ static inline void DeleteInvalidLTR (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
   int32_t i;
-  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   SLogContext* pLogCtx = & (pCtx->sLogCtx);
 
   for (i = 0; i < LONG_TERM_REF_NUM; i++) {
@@ -196,7 +196,7 @@ static inline void HandleLTRMarkFeedback (sWelsEncCtx* pCtx) {
   SRefList* pRefList            = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList       = pRefList->pLongRefList;
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   int32_t i, j;
 
   if (pLtr->uiLtrMarkState == LTR_MARKING_SUCCESS) {
@@ -253,12 +253,12 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
   SPicture** pLongRefList = pRefList->pLongRefList;
   SPicture** pShortRefList = pRefList->pShortRefList;
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
-  int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
+  int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam.uiGopSize >> 1) > 1) ? (pCtx->pSvcParam.uiGopSize >> 1) : (1);
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
   int32_t i = 0;
   int32_t j = 0;
   bool bMoveLtrFromShortToLong = false;
-  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
 
   if (pCtx->eSliceType == I_SLICE) {
     i = 0;
@@ -303,7 +303,7 @@ static inline void LTRMarkProcess (sWelsEncCtx* pCtx) {
     }
     pLongRefList[0] = pShortRefList[i];
     pRefList->uiLongRefCount++;
-    if (pRefList->uiLongRefCount > pCtx->pSvcParam->iLTRRefNum) {
+    if (pRefList->uiLongRefCount > pCtx->pSvcParam.iLTRRefNum) {
       pRefList->pLongRefList[pRefList->uiLongRefCount - 1]->SetUnref();
       DeleteLTRFromLongList (pCtx, pRefList->uiLongRefCount - 1);
     }
@@ -328,7 +328,7 @@ static inline void LTRMarkProcessScreen (sWelsEncCtx* pCtx) {
 
 static void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
   SRefList* pRefList            = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
-  const int32_t kiNumRef        = pCtx->pSvcParam->iNumRefFrame;
+  const int32_t kiNumRef        = pCtx->pSvcParam.iNumRefFrame;
   int32_t i;
 
   pRefList->pNextBuffer = NULL;
@@ -353,7 +353,7 @@ static void PrefetchNextBuffer (sWelsEncCtx* pCtx) {
 bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
   SRefList* pRefList                = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr                   = &pCtx->pLtr[pCtx->uiDependencyId];
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
 
   int32_t iRefIdx                   = 0;
   const uint8_t kuiTid              = pCtx->uiTemporalId;
@@ -374,7 +374,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
       // Expanding picture for future reference
       ExpandReferencingPicture (pCtx->pDecPic->pData, pCtx->pDecPic->iWidthInPixel, pCtx->pDecPic->iHeightInPixel,
                                 pCtx->pDecPic->iLineSize,
-                                pCtx->pFuncList->sExpandPicFunc.pfExpandLumaPicture, pCtx->pFuncList->sExpandPicFunc.pfExpandChromaPicture);
+                                pCtx->pFuncList.sExpandPicFunc.pfExpandLumaPicture, pCtx->pFuncList.sExpandPicFunc.pfExpandChromaPicture);
 
     // move picture in list
     pCtx->pDecPic->uiTemporalId = kuiTid;
@@ -393,7 +393,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
 
   if (keSliceType == P_SLICE) {
     if (pCtx->uiTemporalId == 0) {
-      if (pCtx->pSvcParam->bEnableLongTermReference) {
+      if (pCtx->pSvcParam.bEnableLongTermReference) {
         LTRMarkProcess (pCtx);
         DeleteInvalidLTR (pCtx);
         HandleLTRMarkFeedback (pCtx);
@@ -414,7 +414,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
       }
     }
   } else { // in case IDR currently coding
-    if (pCtx->pSvcParam->bEnableLongTermReference) {
+    if (pCtx->pSvcParam.bEnableLongTermReference) {
       LTRMarkProcess (pCtx);
 
       pLtr->iCurLtrIdx = (pLtr->iCurLtrIdx + 1) % LONG_TERM_REF_NUM;
@@ -434,9 +434,9 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
   SLTRState* pLtr = &pCtx->pLtr[pCtx->uiDependencyId];
   SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** pLongRefList = pRefList->pLongRefList;
-  int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
+  int32_t iGoPFrameNumInterval = ((pCtx->pSvcParam.uiGopSize >> 1) > 1) ? (pCtx->pSvcParam.uiGopSize >> 1) : (1);
   int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
-  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   int32_t i;
 
   for (i = 0; i < pRefList->uiLongRefCount; i++) {
@@ -467,11 +467,11 @@ void WelsMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
                           SSlice** ppSliceList, const int32_t kiCountSliceNum) {
   SSlice* pBaseSlice            = ppSliceList[0];
   SRefPicMarking* pRefPicMark   = &pBaseSlice->sSliceHeaderExt.sSliceHeader.sRefMarking;
-  int32_t iGoPFrameNumInterval  = ((pCtx->pSvcParam->uiGopSize >> 1) > 1) ? (pCtx->pSvcParam->uiGopSize >> 1) : (1);
+  int32_t iGoPFrameNumInterval  = ((pCtx->pSvcParam.uiGopSize >> 1) > 1) ? (pCtx->pSvcParam.uiGopSize >> 1) : (1);
 
   memset (pRefPicMark, 0, sizeof (SRefPicMarking));
 
-  if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkingFlag) {
+  if (pCtx->pSvcParam.bEnableLongTermReference && pLtr->bLTRMarkingFlag) {
     if (pLtr->iLTRMarkMode == LTR_DIRECT_MARK) {
       pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = LONG_TERM_REF_NUM - 1;
       pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SET_MAX_LONG;
@@ -495,8 +495,8 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
   const int32_t kiCountSliceNum = pCtx->pCurDqLayer->iMaxSliceNum;
 
-  if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
-    if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->iLtrMarkPeriod
+  if (pCtx->pSvcParam.bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
+    if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam.iLtrMarkPeriod
         && CheckCurMarkFrameNumUsed (pCtx)) {
       pLtr->bLTRMarkingFlag = true;
       pLtr->bLTRMarkEnable = false;
@@ -516,20 +516,20 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
 
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest) {
   //if disable LTR, force IDR
-  if (!pCtx->pSvcParam->bEnableLongTermReference) {
-    for (int32_t iDid = 0; iDid < pCtx->pSvcParam->iSpatialLayerNum; iDid++) {
-      SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iDid];
+  if (!pCtx->pSvcParam.bEnableLongTermReference) {
+    for (int32_t iDid = 0; iDid < pCtx->pSvcParam.iSpatialLayerNum; iDid++) {
+      SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam.sDependencyLayers[iDid];
       pParamInternal->bEncCurFrmAsIdrFlag = true;
     }
   } else {
     SLTRRecoverRequest* pRequest = pLTRRecoverRequest;
     int32_t iLayerId = pLTRRecoverRequest->iLayerId;
-    if ((iLayerId < 0) || (iLayerId >= pCtx->pSvcParam->iSpatialLayerNum))
+    if ((iLayerId < 0) || (iLayerId >= pCtx->pSvcParam.iSpatialLayerNum))
       return false;
 
     SLTRState* pLtr = &pCtx->pLtr[iLayerId];
     int32_t iMaxFrameNumPlus1 = (1 << pCtx->pSps->uiLog2MaxFrameNum);
-    SSpatialLayerInternal* pParamInternal    = &pCtx->pSvcParam->sDependencyLayers[iLayerId];
+    SSpatialLayerInternal* pParamInternal    = &pCtx->pSvcParam.sDependencyLayers[iLayerId];
     if (pRequest->uiFeedbackType == LTR_RECOVERY_REQUEST &&  pRequest->uiIDRPicId == pParamInternal->uiIdrPicId) {
       if (pRequest->iLastCorrectFrameNum == -1) {
         pParamInternal->bEncCurFrmAsIdrFlag = true;
@@ -562,13 +562,13 @@ int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRec
 }
 void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarkingFeedback) {
   int32_t iLayerId = pLTRMarkingFeedback->iLayerId;
-  if ((iLayerId < 0) || (iLayerId >= pCtx->pSvcParam->iSpatialLayerNum)) {
+  if ((iLayerId < 0) || (iLayerId >= pCtx->pSvcParam.iSpatialLayerNum)) {
     return;
   }
   SLTRState* pLtr = &pCtx->pLtr[iLayerId];
   assert (pLTRMarkingFeedback);
-  if (pCtx->pSvcParam->bEnableLongTermReference) {
-    SSpatialLayerInternal* pParamInternal    = &pCtx->pSvcParam->sDependencyLayers[iLayerId];
+  if (pCtx->pSvcParam.bEnableLongTermReference) {
+    SSpatialLayerInternal* pParamInternal    = &pCtx->pSvcParam.sDependencyLayers[iLayerId];
     if (pLTRMarkingFeedback->uiIDRPicId == pParamInternal->uiIdrPicId
         && (pLTRMarkingFeedback->uiFeedbackType == LTR_MARKING_SUCCESS
             || pLTRMarkingFeedback->uiFeedbackType == LTR_MARKING_FAILED)) { // avoid error pData
@@ -594,10 +594,10 @@ void FilterLTRMarkingFeedback (sWelsEncCtx* pCtx, SLTRMarkingFeedback* pLTRMarki
 bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
   SRefList* pRefList            = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
-  const int32_t kiNumRef        = pCtx->pSvcParam->iNumRefFrame;
+  const int32_t kiNumRef        = pCtx->pSvcParam.iNumRefFrame;
   const uint8_t kuiTid          = pCtx->uiTemporalId;
   uint32_t i                    = 0;
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   // to support any type of cur_dq->mgs_control
   //    [ 0:    using current layer to do ME/MC;
   //     -1:    using store base layer to do ME/MC;
@@ -607,7 +607,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
 
   pCtx->iNumRef0 = 0;
   if (pCtx->eSliceType != I_SLICE) {
-    if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bReceivedT0LostFlag && pCtx->uiTemporalId == 0) {
+    if (pCtx->pSvcParam.bEnableLongTermReference && pLtr->bReceivedT0LostFlag && pCtx->uiTemporalId == 0) {
       for (i = 0; i < pRefList->uiLongRefCount; i++) {
         if (pRefList->pLongRefList[i]->uiRecieveConfirmed == RECIEVE_SUCCESS) {
           pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefList->pLongRefList[i];
@@ -677,7 +677,7 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
     /*syntax for num_ref_idx_l0_active_minus1*/
     pSliceHdr->uiRefCount = pCtx->iNumRef0;
     if (pCtx->iNumRef0 > 0) {
-      if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam->bEnableLongTermReference)) {
+      if ((!pCtx->pRefList0[0]->bIsLongRef) || (!pCtx->pSvcParam.bEnableLongTermReference)) {
         pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 0;
         pRefReorder->SReorderingSyntax[0].uiAbsDiffPicNumMinus1 = iAbsDiffPicNumMinus1;
         pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
@@ -694,12 +694,12 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
     /*syntax for dec_ref_pic_marking()*/
     if (videoFrameTypeIDR == uiFrameType) {
       pRefPicMark->bNoOutputOfPriorPicsFlag = false;
-      pRefPicMark->bLongTermRefFlag = pCtx->pSvcParam->bEnableLongTermReference;
+      pRefPicMark->bLongTermRefFlag = pCtx->pSvcParam.bEnableLongTermReference;
     } else {
-      if (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME)
-        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = pCtx->pSvcParam->bEnableLongTermReference;
+      if (pCtx->pSvcParam.iUsageType == SCREEN_CONTENT_REAL_TIME)
+        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = pCtx->pSvcParam.bEnableLongTermReference;
       else
-        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = (pCtx->pSvcParam->bEnableLongTermReference
+        pRefPicMark->bAdaptiveRefPicMarkingModeFlag = (pCtx->pSvcParam.bEnableLongTermReference
             && pLtr->bLTRMarkingFlag) ? (true) : (false);
     }
   }
@@ -710,7 +710,7 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
  */
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
   int32_t iAbsDiffPicNumMinus1   = -1;
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   /*syntax for ref_pic_list_reordering()*/
   if (pCtx->iNumRef0 > 0) {
     iAbsDiffPicNumMinus1 = pParamD->iFrameNum - (pCtx->pRefList0[0]->iFrameNum) - 1;
@@ -763,7 +763,7 @@ static void UpdateSrcPicList (sWelsEncCtx* pCtx) {
 bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
   SRefList* pRefList                = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SLTRState* pLtr                   = &pCtx->pLtr[pCtx->uiDependencyId];
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   const uint8_t kuiTid              = pCtx->uiTemporalId;
   // Need update ref list in case store base layer or target dependency layer construction
   if (NULL == pCtx->pCurDqLayer)
@@ -779,7 +779,7 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
       // Expanding picture for future reference
       ExpandReferencingPicture (pCtx->pDecPic->pData, pCtx->pDecPic->iWidthInPixel, pCtx->pDecPic->iHeightInPixel,
                                 pCtx->pDecPic->iLineSize,
-                                pCtx->pFuncList->sExpandPicFunc.pfExpandLumaPicture, pCtx->pFuncList->sExpandPicFunc.pfExpandChromaPicture);
+                                pCtx->pFuncList.sExpandPicFunc.pfExpandLumaPicture, pCtx->pFuncList.sExpandPicFunc.pfExpandChromaPicture);
 
     // move picture in list
     pCtx->pDecPic->uiTemporalId = pCtx->uiTemporalId;
@@ -788,7 +788,7 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
     pCtx->pDecPic->iFramePoc    = pParamD->iPOC;
     pCtx->pDecPic->bUsedAsRef   = true;
     pCtx->pDecPic->bIsLongRef   = true;
-    pCtx->pDecPic->bIsSceneLTR  = pLtr->bLTRMarkingFlag || (pCtx->pSvcParam->bEnableLongTermReference
+    pCtx->pDecPic->bIsSceneLTR  = pLtr->bLTRMarkingFlag || (pCtx->pSvcParam.bEnableLongTermReference
                                   && pCtx->eSliceType == I_SLICE);
     pCtx->pDecPic->iLongTermPicNum = pLtr->iCurLtrIdx;
   }
@@ -811,10 +811,10 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
 
 bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
   SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
-  SWelsSvcCodingParam* pParam = pCtx->pSvcParam;
+  SWelsSvcCodingParam* pParam = &pCtx->pSvcParam;
   SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pCtx->pVaa);
   const int32_t iNumRef = pParam->iNumRefFrame;
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
   pCtx->iNumRef0 = 0;
 
   if (pCtx->eSliceType != I_SLICE) {
@@ -895,10 +895,10 @@ void WelsMarkMMCORefInfoScreen (sWelsEncCtx* pCtx, SLTRState* pLtr,
                                 SSlice** ppSliceList, const int32_t kiCountSliceNum) {
   SSlice* pBaseSlice          = ppSliceList[0];
   SRefPicMarking* pRefPicMark = &pBaseSlice->sSliceHeaderExt.sSliceHeader.sRefMarking;
-  const int32_t iMaxLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1;
+  const int32_t iMaxLtrIdx = pCtx->pSvcParam.iNumRefFrame - STR_ROOM - 1;
 
   memset (pRefPicMark, 0, sizeof (SRefPicMarking));
-  if (pCtx->pSvcParam->bEnableLongTermReference) {
+  if (pCtx->pSvcParam.bEnableLongTermReference) {
     pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount].iMaxLongTermFrameIdx = iMaxLtrIdx;
     pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_SET_MAX_LONG;
 
@@ -911,20 +911,20 @@ void WelsMarkMMCORefInfoScreen (sWelsEncCtx* pCtx, SLTRState* pLtr,
 
 void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
   SLTRState* pLtr          = &pCtx->pLtr[pCtx->uiDependencyId];
-  int32_t iMaxTid          = WELS_LOG2 (pCtx->pSvcParam->uiGopSize);
+  int32_t iMaxTid          = WELS_LOG2 (pCtx->pSvcParam.uiGopSize);
   int32_t iMaxActualLtrIdx = -1;
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
-  if (pCtx->pSvcParam->bEnableLongTermReference)
-    iMaxActualLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1 -  WELS_MAX (iMaxTid , 1);
+  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam.sDependencyLayers[pCtx->uiDependencyId];
+  if (pCtx->pSvcParam.bEnableLongTermReference)
+    iMaxActualLtrIdx = pCtx->pSvcParam.iNumRefFrame - STR_ROOM - 1 -  WELS_MAX (iMaxTid , 1);
 
   SRefList* pRefList =  pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SPicture** ppLongRefList = pRefList->pLongRefList;
-  const int32_t iNumRef = pCtx->pSvcParam->iNumRefFrame;
+  const int32_t iNumRef = pCtx->pSvcParam.iNumRefFrame;
   int32_t i;
   const int32_t iLongRefNum = iNumRef - STR_ROOM;
   const bool bIsRefListNotFull = pRefList->uiLongRefCount < iLongRefNum;
 
-  if (!pCtx->pSvcParam->bEnableLongTermReference) {
+  if (!pCtx->pSvcParam.bEnableLongTermReference) {
     pLtr->iCurLtrIdx = pCtx->uiTemporalId;
   } else {
     if (iMaxActualLtrIdx != -1 && pCtx->uiTemporalId == 0 && pCtx->bCurFrameMarkedAsSceneLtr) {

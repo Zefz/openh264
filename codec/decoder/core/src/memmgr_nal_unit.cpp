@@ -44,7 +44,7 @@
 
 namespace WelsDec {
 
-int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign* pMa) {
+int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize) {
   uint32_t uiIdx = 0;
   uint8_t* pBase = NULL, *pPtr = NULL;
   static constexpr uint32_t SIZE_AU = sizeof (SAccessUnit);
@@ -56,10 +56,10 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
     return ERR_INFO_INVALID_PARAM;
 
   if (*ppAu != NULL) {
-    MemFreeNalList (ppAu, pMa);
+    MemFreeNalList (ppAu);
   }
 
-  pBase = (uint8_t*)pMa->WelsMallocz (kuiCountSize, "Access Unit");
+  pBase = (uint8_t*)WelsMallocz (kuiCountSize, "Access Unit");
   if (pBase == NULL)
     return ERR_INFO_OUT_OF_MEMORY;
   pPtr = pBase;
@@ -83,11 +83,11 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
   return ERR_NONE;
 }
 
-int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa) {
+int32_t MemFreeNalList (PAccessUnit* ppAu) {
   if (ppAu != NULL) {
     PAccessUnit pAu = *ppAu;
     if (pAu != NULL) {
-      pMa->WelsFree (pAu, "Access Unit");
+      WelsFree (pAu, "Access Unit");
       *ppAu = NULL;
     }
   }
@@ -95,14 +95,14 @@ int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa) {
 }
 
 
-int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int32_t kiExpSize, CMemoryAlign* pMa) {
+int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int32_t kiExpSize) {
   if (kiExpSize <= kiOrgSize)
     return ERR_INFO_INVALID_PARAM;
   else {
     PAccessUnit pTmp = NULL;
     int32_t iIdx = 0;
     int32_t iRet = ERR_NONE;
-    if ((iRet = MemInitNalList (&pTmp, kiExpSize, pMa)) != ERR_NONE) // request new list with expanding
+    if ((iRet = MemInitNalList (&pTmp, kiExpSize)) != ERR_NONE) // request new list with expanding
       return iRet;
 
     do {
@@ -116,7 +116,7 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
     pTmp->uiEndPos              = (*ppAu)->uiEndPos;
     pTmp->bCompletedAuFlag      = (*ppAu)->bCompletedAuFlag;
 
-    MemFreeNalList (ppAu, pMa); // free old list
+    MemFreeNalList (ppAu); // free old list
     *ppAu = pTmp;
     return ERR_NONE;
   }
@@ -127,13 +127,13 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
  *  Get next NAL Unit for using.
  *  Need expand NAL Unit list if exceeding count number of available NAL Units withing an Access Unit
  */
-PNalUnit MemGetNextNal (PAccessUnit* ppAu, CMemoryAlign* pMa) {
+PNalUnit MemGetNextNal (PAccessUnit* ppAu) {
   PAccessUnit pAu = *ppAu;
   PNalUnit pNu = NULL;
 
   if (pAu->uiAvailUnitsNum >= pAu->uiCountUnitsNum) { // need expand list
     const uint32_t kuiExpandingSize = pAu->uiCountUnitsNum + (MAX_NAL_UNIT_NUM_IN_AU >> 1);
-    if (ExpandNalUnitList (ppAu, pAu->uiCountUnitsNum, kuiExpandingSize, pMa))
+    if (ExpandNalUnitList (ppAu, pAu->uiCountUnitsNum, kuiExpandingSize))
       return NULL; // out of memory
     pAu = *ppAu;
   }

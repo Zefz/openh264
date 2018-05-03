@@ -43,7 +43,8 @@ target_compile_options(decoder PRIVATE -O3 -Wno-format -fno-strict-aliasing -fPI
 target_include_directories(decoder PRIVATE
         ${PROJECT_SOURCE_DIR}/codec/decoder/core/inc
         ${PROJECT_SOURCE_DIR}/codec/decoder/plus/inc
-        ${PROJECT_SOURCE_DIR}/codec/common/inc)
+        ${PROJECT_SOURCE_DIR}/codec/common/inc
+        ${PROJECT_SOURCE_DIR}/codec/api/svc)
 
 add_executable(h264dec ${PROJECT_SOURCE_DIR}/codec/console/dec/src/h264dec.cpp)
 link_directories(${PROJECT_SOURCE_DIR})
@@ -97,7 +98,6 @@ add_executable(h264enc
 
         ${PROJECT_SOURCE_DIR}/codec/common/src/utils.cpp
         ${PROJECT_SOURCE_DIR}/codec/common/src/sad_common.cpp
-        ${PROJECT_SOURCE_DIR}/codec/common/src/memory_align.cpp
         ${PROJECT_SOURCE_DIR}/codec/common/src/mc.cpp
         ${PROJECT_SOURCE_DIR}/codec/common/src/intra_pred_common.cpp
         ${PROJECT_SOURCE_DIR}/codec/common/src/expand_pic.cpp

@@ -74,7 +74,7 @@ uint8_t         uiReserved[3];          // reserved padding bytes
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight, CMemoryAlign* pMa);
+int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 /*!
  * \brief   Uninitialize Wels Flexible Macroblock Ordering (FMO) list
@@ -85,7 +85,7 @@ int32_t InitFmo (PFmo pFmo, PPps pPps, const int32_t kiMbWidth, const int32_t ki
  *
  * \return  NONE
  */
-void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail, CMemoryAlign* pMa);
+void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail);
 
 /*!
  * \brief   update/insert FMO parameter unit
@@ -97,7 +97,7 @@ void UninitFmoList (PFmo pFmo, const int32_t kiCnt, const int32_t kiAvail, CMemo
  *
  * \return  true - update/insert successfully; false - failed;
  */
-int32_t FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum, CMemoryAlign* pMa);
+int32_t FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum);
 
 /*!
  * \brief   Get successive mb to be processed with given current mb_xy

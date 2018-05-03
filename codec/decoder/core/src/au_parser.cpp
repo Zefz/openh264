@@ -264,7 +264,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   case NAL_UNIT_CODED_SLICE_IDR: {
     PAccessUnit pCurAu = NULL;
     uint32_t uiAvailNalNum;
-    pCurNal = MemGetNextNal (&pCtx->pAccessUnitList, pCtx->pMemAlign);
+    pCurNal = MemGetNextNal (&pCtx->pAccessUnitList);
     if (NULL == pCurNal) {
       WelsLog (pLogCtx, WELS_LOG_ERROR, "MemGetNextNal() fail due out of memory.");
       pCtx->iErrorCode |= dsOutOfMemory;
@@ -1727,7 +1727,7 @@ int32_t ResetFmoList (PWelsDecoderContext pCtx) {
   int32_t iCountNum = 0;
   if (NULL != pCtx) {
     // Fixed memory leak due to PPS_ID might not be continuous sometimes, 1/5/2010
-    UninitFmoList (&pCtx->sFmoList[0], MAX_PPS_COUNT, pCtx->iActiveFmoNum, pCtx->pMemAlign);
+    UninitFmoList (&pCtx->sFmoList[0], MAX_PPS_COUNT, pCtx->iActiveFmoNum);
     iCountNum = pCtx->iActiveFmoNum;
     pCtx->iActiveFmoNum = 0;
   }

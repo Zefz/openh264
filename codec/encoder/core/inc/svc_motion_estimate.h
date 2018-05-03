@@ -303,14 +303,14 @@ void SumOf16x16BlockOfFrame_AArch64_neon (uint8_t* pRefPicture, const int32_t ki
                                   uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
 }
 #endif
-int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
+int32_t RequestScreenBlockFeatureStorage (const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
     const int32_t iNeedFeatureStorage,
     SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
-int32_t ReleaseScreenBlockFeatureStorage (CMemoryAlign* pMa, SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
-int32_t RequestFeatureSearchPreparation (CMemoryAlign* pMa, const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
+int32_t ReleaseScreenBlockFeatureStorage (SScreenBlockFeatureStorage* pScreenBlockFeatureStorage);
+int32_t RequestFeatureSearchPreparation (const int32_t kiFrameWidth,  const int32_t kiFrameHeight,
     const int32_t iNeedFeatureStorage,
     SFeatureSearchPreparation* pFeatureSearchPreparation);
-int32_t ReleaseFeatureSearchPreparation (CMemoryAlign* pMa, uint16_t*& pFeatureOfBlock);
+int32_t ReleaseFeatureSearchPreparation (uint16_t*& pFeatureOfBlock);
 
 #define FMESWITCH_DEFAULT_GOODFRAME_NUM (2)
 #define FME_DEFAULT_FEATURE_INDEX (0)

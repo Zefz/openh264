@@ -119,7 +119,6 @@ uint8_t*        pRestoreBuffer;
  * \return  0 - successful; none 0 - failed;
  */
 int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
-                          CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
@@ -134,7 +133,7 @@ int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
  *
  * \return  NONE;
  */
-void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa);
+void UninitSlicePEncCtx (SDqLayer* pCurDq);
 
 /*!
  * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)

@@ -48,16 +48,16 @@
 
 namespace WelsDec {
 
-int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign* pMa);
+int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize);
 
-int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa);
+int32_t MemFreeNalList (PAccessUnit* ppAu);
 
 /*
  *  MemGetNextNal
  *  Get next NAL Unit for using.
  *  Need expand NAL Unit list if exceeding count number of available NAL Units withing an Access Unit
  */
-PNalUnit MemGetNextNal (PAccessUnit* ppAu, CMemoryAlign* pMa);
+PNalUnit MemGetNextNal (PAccessUnit* ppAu);
 
 } // namespace WelsDec
 

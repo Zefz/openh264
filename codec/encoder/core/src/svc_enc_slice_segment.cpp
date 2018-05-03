@@ -350,7 +350,6 @@ int32_t GetInitialSliceNum (SSliceArgument* pSliceArgument) {
  * \return  0 - successful; none 0 - failed;
  */
 int32_t InitSliceSegment (SDqLayer* pCurDq,
-                          CMemoryAlign* pMa,
                           SSliceArgument* pSliceArgument,
                           const int32_t kiMbWidth,
                           const int32_t kiMbHeight) {
@@ -367,7 +366,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
     return 0;
   else if (pSliceSeg->iMbNumInFrame != kiCountMbNum) {
     if (NULL != pSliceSeg->pOverallMbMap) {
-      pMa->WelsFree (pSliceSeg->pOverallMbMap, "pSliceSeg->pOverallMbMap");
+      WelsFree (pSliceSeg->pOverallMbMap, "pSliceSeg->pOverallMbMap");
 
       pSliceSeg->pOverallMbMap = NULL;
     }
@@ -381,7 +380,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
   }
 
   if (SM_SINGLE_SLICE == uiSliceMode) {
-    pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMallocz (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
+    pSliceSeg->pOverallMbMap = (uint16_t*)WelsMallocz (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
     pSliceSeg->iSliceNumInFrame = 1;
@@ -397,7 +396,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
         && uiSliceMode != SM_SIZELIMITED_SLICE)
       return 1;
 
-    pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMallocz (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
+    pSliceSeg->pOverallMbMap = (uint16_t*)WelsMallocz (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
 
     WelsSetMemMultiplebytes_c (pSliceSeg->pOverallMbMap, 0, kiCountMbNum, sizeof (uint16_t));
@@ -440,11 +439,11 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
  *
  * \return  none;
  */
-void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
+void UninitSliceSegment (SDqLayer* pCurDq) {
   SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
   if (NULL != pSliceSeg) {
     if (NULL != pSliceSeg->pOverallMbMap) {
-      pMa->WelsFree (pSliceSeg->pOverallMbMap, "pSliceSeg->pOverallMbMap");
+      WelsFree (pSliceSeg->pOverallMbMap, "pSliceSeg->pOverallMbMap");
 
       pSliceSeg->pOverallMbMap = NULL;
     }
@@ -474,7 +473,6 @@ void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
  * \return  0 - successful; none 0 - failed;
  */
 int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
-                          CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
@@ -484,7 +482,6 @@ int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
     return 1;
 
   InitSliceSegment (pCurDq,
-                    pMa,
                     pSliceArgument,
                     iMbWidth,
                     iMbHeight);
@@ -499,9 +496,9 @@ int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
  *
  * \return  NONE;
  */
-void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa) {
+void UninitSlicePEncCtx (SDqLayer* pCurDq) {
   if (NULL != pCurDq) {
-    UninitSliceSegment (pCurDq, pMa);
+    UninitSliceSegment (pCurDq);
   }
 }
 

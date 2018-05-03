@@ -293,7 +293,7 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
       pSlice->uiLastMbQp = pCurMb->uiLumaQp;
 
       BsWriteSE (pBs, kiDeltaQp);
-      if (WelsWriteMbResidual (pEncCtx->pFuncList, pMbCache, pCurMb, pBs))
+      if (WelsWriteMbResidual (&pEncCtx->pFuncList, pMbCache, pCurMb, pBs))
         return ENC_RETURN_VLCOVERFLOWFOUND;
     } else {
       pCurMb->uiLumaQp = pSlice->uiLastMbQp;
