@@ -41,6 +41,7 @@
 #include <chrono>
 #include <welsDecoderExt.h>
 #include <OpenH264Decoder.hpp>
+#include <codec_app_def.h>
 
 #include "codec_def.h"
 #include "codec_app_def.h"
@@ -58,13 +59,17 @@ static int streamToFile(uint8_t* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
         int iHeight = pInfo->UsrData.sSystemBuffer.iHeight;
         iStride[0] = pInfo->UsrData.sSystemBuffer.iStride[0];
         iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
+        //std::cout << "size = " << iWidth << "x" << iHeight << "\n";
+        //std::cout << "Stride = " << iStride[0] << ", " << iStride[1] << "\n";
 
         unsigned char*  pPtr = NULL;
+        size_t frameSize = 0;
 
         pPtr = pDst[0];
         for (int i = 0; i < iHeight; i++) {
             fwrite (pPtr, 1, iWidth, pFp);
             pPtr += iStride[0];
+            frameSize += iStride[0];
         }
 
         iHeight = iHeight / 2;
@@ -73,13 +78,16 @@ static int streamToFile(uint8_t* pDst[3], SBufferInfo* pInfo, FILE* pFp) {
         for (int i = 0; i < iHeight; i++) {
             fwrite (pPtr, 1, iWidth, pFp);
             pPtr += iStride[1];
+            frameSize += iStride[1];
         }
 
         pPtr = pDst[2];
         for (int i = 0; i < iHeight; i++) {
             fwrite (pPtr, 1, iWidth, pFp);
             pPtr += iStride[1];
+            frameSize += iStride[1];
         }
+        //std::cout << "Frame size = " << frameSize << " bytes\n";
     }
 
     return iRet;
@@ -162,6 +170,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         //    iBufPos += 256;
         //}
 
+
         //Find next slice
         int32_t iSliceSize;
         for (iSliceSize = 4; iSliceSize < iFileSize; iSliceSize++) {
@@ -195,6 +204,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         }
 
         iBufPos += iSliceSize;
+        //std::cout << "slice size: " << iSliceSize << "\n";
     }
     static constexpr int32_t END_OF_STREAM_FLAG = 0;
     pDecoder->SetOption(DECODER_OPTION_END_OF_STREAM, (void*)&END_OF_STREAM_FLAG);

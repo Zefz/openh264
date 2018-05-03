@@ -1020,13 +1020,11 @@ int32_t InitSliceThreadInfo (sWelsEncCtx* pCtx,
                              SDqLayer* pDqLayer,
                              const int32_t kiDlayerIndex,
                              CMemoryAlign* pMa) {
-  int32_t iThreadNum      = pCtx->pSvcParam->iMultipleThreadIdc;
+  static constexpr int32_t iThreadNum      = 1;
   int32_t iMaxSliceNum    = 0;
   int32_t iSlcBufferNum   = 0;
   int32_t iIdx            = 0;
   int32_t iRet            = 0;
-
-  assert (iThreadNum > 0);
 
   //for fixed slice num case, no need to reallocate, so one slice buffer for all thread
   if (pDqLayer->bThreadSlcBufferFlag) {
@@ -1081,11 +1079,8 @@ int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
 
   //SM_SINGLE_SLICE mode using single-thread bs writer pOut->sBsWrite
   //even though multi-thread is on for other layers
-  pDqLayer->bSliceBsBufferFlag = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
-                                  SM_SINGLE_SLICE != pSliceArgument->uiSliceMode) ? true : false;
-
-  pDqLayer->bThreadSlcBufferFlag = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
-                                    SM_SIZELIMITED_SLICE == pSliceArgument->uiSliceMode) ? true : false;
+  pDqLayer->bSliceBsBufferFlag = false;
+  pDqLayer->bThreadSlcBufferFlag = false;
 
   iRet = InitSliceThreadInfo (pCtx,
                               pDqLayer,
@@ -1203,9 +1198,6 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
     return ENC_RETURN_INVALIDINPUT;
   }
 
-  bool bIndependenceBsBuffer  = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
-                                 SM_SINGLE_SLICE != pSliceArgument->uiSliceMode) ? true : false;
-
   pNewSliceList = (SSlice*)pMA->WelsMallocz (sizeof (SSlice) * kiMaxSliceNumNew, "pSliceBuffer");
   if (NULL == pNewSliceList) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::ReallocateSliceList: pNewSliceList is NULL");
@@ -1220,10 +1212,6 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
     if (NULL == pSlice) {
       FreeSliceBuffer (pNewSliceList, kiMaxSliceNumNew, pMA, "pSliceBuffer");
       return ENC_RETURN_MEMALLOCERR;
-    }
-
-    if (bIndependenceBsBuffer) {
-      pSlice->pSliceBsa  = &pSlice->sSliceBs.sBsWrite;
     }
   }
 
@@ -1247,7 +1235,7 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
 
     iRet = InitSliceBsBuffer (pSlice,
                               & pCtx->pOut->sBsWrite,
-                              bIndependenceBsBuffer,
+                              false,
                               iMaxSliceBufferSize,
                               pMA);
     if (ENC_RETURN_SUCCESS != iRet) {
@@ -1755,10 +1743,6 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
              "DynSlcJudgeSliceBoundaryStepBack: AddSliceBoundary: iCurMbIdx=%d, uiLen=%d, iSliceIdx=%d", iCurMbIdx, uiLen,
              pCurSlice->iSliceIdx);
 
-    if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
-      WelsMutexLock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
-      //lock the acessing to this variable: pSliceCtx->iSliceNumInFrame
-    }
     //tmp choice to avoid complex memory operation, 100520, to be modify
     //TODO: pSliceCtx->iSliceNumInFrame should match max slice num limitation in given profile based on standard
     //      current change is tmp solution which equal to origin design,
@@ -1767,10 +1751,6 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
     //  tmp change is:  iMaxSliceNumConstraint is alway set to be MAXSLICENUM, will not change even reallocate
     AddSliceBoundary (pEncCtx, pCurSlice, pSliceCtx, pCurMb, iCurMbIdx, kiEndMbIdxOfPartition);
     ++ pSliceCtx->iSliceNumInFrame;
-
-    if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
-      WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
-    }
 
     return true;
   }

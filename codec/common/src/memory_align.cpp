@@ -50,6 +50,13 @@ void* CMemoryAlign::WelsMallocz (const uint32_t kuiSize, const char* kpTag) {
 #ifdef __linux__
   std::cout << "[" << kpTag << "]" << " zMalloc " << kuiSize << " bytes\n";
 #endif
+
+  /*
+  void* result = aligned_alloc(m_nCacheLineSize, kuiSize);
+  memset(result, 0, kuiSize);
+  return result;
+  */
+
   return calloc(kuiSize, sizeof(uint8_t));
 }
 

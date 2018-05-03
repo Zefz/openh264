@@ -33,6 +33,8 @@
 #pragma once
 
 #include "typedefs.h"
+#include <cstdio>
+#include <memory>
 
 namespace WelsCommon {
 
@@ -46,5 +48,23 @@ public:
 protected:
     uint32_t        m_nCacheLineSize;
 };
+
+#define  WELS_NEW_OP(object, type)   \
+  (type*)(new object);
+
+#define  WELS_DELETE_OP(p) \
+  if(p) delete p;            \
+  p = NULL;
+
+static inline void* WelsMallocz(const uint32_t kuiSize, const char* kpTag = nullptr) {
+#ifdef __linux__
+    printf("[%s] zMalloc %ul bytes", kpTag == nullptr ? "unknown" : kpTag, kuiSize);
+#endif
+  return calloc(kuiSize, sizeof(uint8_t));
+}
+
+static inline void WelsFree(void *memory) {
+    free(memory);
+}
 
 }

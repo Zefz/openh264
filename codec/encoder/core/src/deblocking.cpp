@@ -38,6 +38,8 @@
  *************************************************************************************
  */
 
+#include <svc_enc_macroblock.h>
+#include <wels_func_ptr_def.h>
 #include "deblocking.h"
 #include "cpu_core.h"
 

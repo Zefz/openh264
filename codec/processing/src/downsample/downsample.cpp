@@ -54,13 +54,13 @@ CDownsampling::~CDownsampling() {
 }
 bool CDownsampling::AllocateSampleBuffer() {
   for (int32_t i = 0; i < 2; i++) {
-    m_pSampleBuffer[i][0] = (uint8_t*)WelsMalloc (MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT);
+    m_pSampleBuffer[i][0] = (uint8_t*)WelsMalloc(MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT);
     if (!m_pSampleBuffer[i][0])
       goto FREE_RET;
-    m_pSampleBuffer[i][1] = (uint8_t*)WelsMalloc (MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT / 4);
+    m_pSampleBuffer[i][1] = (uint8_t*)WelsMalloc(MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT / 4);
     if (!m_pSampleBuffer[i][1])
       goto FREE_RET;
-    m_pSampleBuffer[i][2] = (uint8_t*)WelsMalloc (MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT / 4);
+    m_pSampleBuffer[i][2] = (uint8_t*)WelsMalloc(MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT / 4);
     if (!m_pSampleBuffer[i][2])
       goto FREE_RET;
   }

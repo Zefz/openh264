@@ -52,12 +52,12 @@ WELSVP_NAMESPACE_BEGIN
 
 CBackgroundDetection::CBackgroundDetection (int32_t iCpuFlag) {
   m_eMethod = METHOD_BACKGROUND_DETECTION;
-  WelsMemset (&m_BgdParam, 0, sizeof (m_BgdParam));
+  memset(&m_BgdParam, 0, sizeof (m_BgdParam));
   m_iLargestFrameSize = 0;
 }
 
 CBackgroundDetection::~CBackgroundDetection() {
-  WelsFree (m_BgdParam.pOU_array);
+  WelsFree(m_BgdParam.pOU_array);
 }
 
 EResult CBackgroundDetection::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {

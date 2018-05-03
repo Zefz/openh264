@@ -30,8 +30,10 @@
  *
  */
 
+#include <wels_func_ptr_def.h>
 #include "decode_mb_aux.h"
 #include "cpu_core.h"
+#include "wels_common_defs.h"
 
 namespace WelsEnc {
 /****************************************************************************

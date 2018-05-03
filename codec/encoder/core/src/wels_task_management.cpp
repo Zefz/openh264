@@ -95,7 +95,7 @@ CWelsTaskManageBase::~CWelsTaskManageBase() {
 
 WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
   m_pEncCtx = pEncCtx;
-  m_iThreadNum = m_pEncCtx->pSvcParam->iMultipleThreadIdc;
+  m_iThreadNum = 1;
 
   int32_t iReturn = ENC_RETURN_SUCCESS;
   //fprintf(stdout, "m_pThreadPool = &(CWelsThreadPool::GetInstance, this=%x\n", this);
@@ -158,11 +158,7 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
       pTask = WELS_NEW_OP (CWelsConstrainedSizeSlicingEncodingTask (this, pEncCtx, idx),
                            CWelsConstrainedSizeSlicingEncodingTask);
     } else {
-      if (pEncCtx->pSvcParam->bUseLoadBalancing) {
-        pTask = WELS_NEW_OP (CWelsLoadBalancingSlicingEncodingTask (this, pEncCtx, idx), CWelsLoadBalancingSlicingEncodingTask);
-      } else {
         pTask = WELS_NEW_OP (CWelsSliceEncodingTask (this, pEncCtx, idx), CWelsSliceEncodingTask);
-      }
     }
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, true != m_cEncodingTaskList[kiCurDid]->push_back (pTask));

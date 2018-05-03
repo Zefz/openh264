@@ -94,8 +94,6 @@ CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
     m_pStgChain[i] = CreateStrategy (WelsStaticCast (EMethods, i + 1), uiCPUFlag);
   }
 
-  WelsMutexInit (&m_mutes);
-
   eReturn = RET_SUCCESS;
 }
 
@@ -107,7 +105,6 @@ CVpFrameWork::~CVpFrameWork() {
     }
   }
 
-  WelsMutexDestroy (&m_mutes);
 }
 
 EResult CVpFrameWork::Init (int32_t iType, void* pCfg) {
@@ -116,13 +113,11 @@ EResult CVpFrameWork::Init (int32_t iType, void* pCfg) {
 
   Uninit (iType);
 
-  WelsMutexLock (&m_mutes);
 
   IStrategy* pStrategy = m_pStgChain[iCurIdx];
   if (pStrategy)
     eReturn = pStrategy->Init (0, pCfg);
 
-  WelsMutexUnlock (&m_mutes);
 
   return eReturn;
 }
@@ -131,13 +126,11 @@ EResult CVpFrameWork::Uninit (int32_t iType) {
   EResult eReturn        = RET_SUCCESS;
   int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
-  WelsMutexLock (&m_mutes);
 
   IStrategy* pStrategy = m_pStgChain[iCurIdx];
   if (pStrategy)
     eReturn = pStrategy->Uninit (0);
 
-  WelsMutexUnlock (&m_mutes);
 
   return eReturn;
 }
@@ -162,13 +155,11 @@ EResult CVpFrameWork::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDst
   if (!CheckValid (eMethod, sSrcPic, sDstPic))
     return RET_INVALIDPARAM;
 
-  WelsMutexLock (&m_mutes);
 
   IStrategy* pStrategy = m_pStgChain[iCurIdx];
   if (pStrategy)
     eReturn = pStrategy->Process (0, &sSrcPic, &sDstPic);
 
-  WelsMutexUnlock (&m_mutes);
 
   return eReturn;
 }
@@ -180,13 +171,11 @@ EResult CVpFrameWork::Get (int32_t iType, void* pParam) {
   if (!pParam)
     return RET_INVALIDPARAM;
 
-  WelsMutexLock (&m_mutes);
 
   IStrategy* pStrategy = m_pStgChain[iCurIdx];
   if (pStrategy)
     eReturn = pStrategy->Get (0, pParam);
 
-  WelsMutexUnlock (&m_mutes);
 
   return eReturn;
 }
@@ -198,13 +187,11 @@ EResult CVpFrameWork::Set (int32_t iType, void* pParam) {
   if (!pParam)
     return RET_INVALIDPARAM;
 
-  WelsMutexLock (&m_mutes);
 
   IStrategy* pStrategy = m_pStgChain[iCurIdx];
   if (pStrategy)
     eReturn = pStrategy->Set (0, pParam);
 
-  WelsMutexUnlock (&m_mutes);
 
   return eReturn;
 }

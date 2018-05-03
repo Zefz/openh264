@@ -142,8 +142,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iComplexityMode       = LOW_COMPLEXITY;
     param.iTargetBitrate        = UNSPECIFIED_BIT_RATE; // overall target bitrate introduced in RC module
     param.iMaxBitrate           = UNSPECIFIED_BIT_RATE;
-    param.iMultipleThreadIdc    = 1;
-    param.bUseLoadBalancing = true;
 
     param.iLTRRefNum            = 0;
     param.iLtrMarkPeriod        = 30;   //the min distance of two int32_t references
@@ -299,9 +297,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     SUsedPicRect.iTop  = 0;
     SUsedPicRect.iWidth = ((iPicWidth >> 1) << 1);
     SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
-
-    iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
-    bUseLoadBalancing = pCodingParam.bUseLoadBalancing;
 
     /* Deblocking loop filter */
     iLoopFilterDisableIdc       = pCodingParam.iLoopFilterDisableIdc;      // 0: on, 1: off, 2: on except for slice boundaries,

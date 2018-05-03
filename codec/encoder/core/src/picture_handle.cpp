@@ -73,7 +73,7 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   iLumaSize         = iPicWidth * iPicHeight;
   iChromaSize       = iPicChromaWidth * iPicChromaHeight;
 
-  pPic->pBuffer = (uint8_t*)pMa->WelsMalloc (iLumaSize /* luma */
+  pPic->pBuffer = (uint8_t*)pMa->WelsMallocz (iLumaSize /* luma */
                   + (iChromaSize << 1) /* Cb,Cr */
                   , "pPic->pBuffer");
   WELS_VERIFY_RETURN_PROC_IF (NULL, NULL == pPic->pBuffer, FreePicture (pMa, &pPic));

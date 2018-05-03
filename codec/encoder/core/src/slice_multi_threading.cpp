@@ -270,11 +270,11 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
 
   assert (iThreadNum > 0);
 
-  pSmt = (SSliceThreading*)pMa->WelsMalloc (sizeof (SSliceThreading), "SSliceThreading");
+  pSmt = (SSliceThreading*)pMa->WelsMallocz (sizeof (SSliceThreading), "SSliceThreading");
   WELS_VERIFY_RETURN_IF (1, (NULL == pSmt))
   memset (pSmt, 0, sizeof (SSliceThreading));
   (*ppCtx)->pSliceThreading = pSmt;
-  pSmt->pThreadPEncCtx = (SSliceThreadPrivateData*)pMa->WelsMalloc (sizeof (SSliceThreadPrivateData) * iThreadNum,
+  pSmt->pThreadPEncCtx = (SSliceThreadPrivateData*)pMa->WelsMallocz (sizeof (SSliceThreadPrivateData) * iThreadNum,
                          "pThreadPEncCtx");
   WELS_VERIFY_RETURN_IF (1, (NULL == pSmt->pThreadPEncCtx))
 

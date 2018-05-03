@@ -63,7 +63,7 @@ void RcInitLayerMemory (SWelsSvcRc* pWelsSvcRc, CMemoryAlign* pMA, const int32_t
   const int32_t kiGomSizeD      = kiGomSize * sizeof (double);
   const int32_t kiGomSizeI      = kiGomSize * sizeof (int32_t);
   const int32_t kiLayerRcSize   = kiGomSizeD + (kiGomSizeI * 3) +  sizeof (SRCTemporal) * kiMaxTl;
-  uint8_t* pBaseMem             = (uint8_t*)pMA->WelsMalloc (kiLayerRcSize, "pWelsSvcRc->pTemporalOverRc");
+  uint8_t* pBaseMem             = (uint8_t*)pMA->WelsMallocz (kiLayerRcSize, "pWelsSvcRc->pTemporalOverRc");
 
   if (NULL == pBaseMem)
     return;

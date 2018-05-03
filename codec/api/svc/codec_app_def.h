@@ -565,10 +565,6 @@ typedef struct TagEncParamExt {
   bool     bEnableLongTermReference;   ///< 1: on, 0: off
   int      iLTRRefNum;                 ///< the number of LTR(long term reference),TODO: not supported to set it arbitrary yet
   unsigned int      iLtrMarkPeriod;    ///< the LTR marked period that is used in feedback.
-  /* multi-thread settings*/
-  unsigned short
-  iMultipleThreadIdc;                  ///< 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; lager than 1: count number of threads;
-  bool  bUseLoadBalancing; ///< only used when uiSliceMode=1 or 3, will change slicing of a picture during the run-time of multi-thread encoding, so the result of each run may be different
 
   /* Deblocking loop filter */
   int       iLoopFilterDisableIdc;     ///< 0: on, 1: off, 2: on except for slice boundaries
