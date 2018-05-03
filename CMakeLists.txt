@@ -61,7 +61,7 @@ add_executable(h264enc
         ${PROJECT_SOURCE_DIR}/codec/console/enc/src/h264encoder.cpp
         ${PROJECT_SOURCE_DIR}/codec/console/common/src/read_config.cpp
 
-        ${PROJECT_SOURCE_DIR}/codec/encoder/plus/src/welsEncoderExt.cpp
+        ${PROJECT_SOURCE_DIR}/codec/encoder/plus/src/OpenH264Encoder.cpp
 
         ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/au_set.cpp
         ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/deblocking.cpp
@@ -91,7 +91,7 @@ add_executable(h264enc
         ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/svc_set_mb_syn_cabac.cpp
         ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/svc_set_mb_syn_cavlc.cpp
         ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/wels_preprocess.cpp
-        ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/wels_task_base.cpp
+#        ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/wels_task_base.cpp
 #        ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/wels_task_encoder.cpp
 #        ${PROJECT_SOURCE_DIR}/codec/encoder/core/src/wels_task_management.cpp
 

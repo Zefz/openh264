@@ -48,14 +48,14 @@ namespace WelsEnc {
  * \param   pEncCtx     sWelsEncCtx*
  * \return  successful - 0; otherwise none 0 for failed
  */
-int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingParasetList);
+int32_t RequestMemorySvc (sWelsEncCtx& ppCtx, SExistingParasetList* pExistingParasetList);
 
 /*!
  * \brief   free memory in SVC core encoder
  * \param   pEncCtx     sWelsEncCtx**
  * \return  none
  */
-void FreeMemorySvc (sWelsEncCtx** ppCtx);
+void FreeMemorySvc (sWelsEncCtx& ppCtx);
 
 /*!
  * \brief    allocate or reallocate the output bs buffer

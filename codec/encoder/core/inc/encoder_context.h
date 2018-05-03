@@ -190,7 +190,7 @@ typedef struct TagWelsEncCtx {
   int32_t           iPpsNum;        // number of pPps used
 
 // Output
-  SWelsEncoderOutput* pOut;         // for NAL raw pData (need allocating memory for sNalList internal)
+  SWelsEncoderOutput pOut;         // for NAL raw pData (need allocating memory for sNalList internal)
   uint8_t*          pFrameBs;       // restoring bitstream pBuffer of all NALs in a frame
   int32_t           iFrameBsSize;   // count size of frame bs in bytes allocated
   int32_t           iPosBsBuffer;   // current writing position of frame bs pBuffer

@@ -38,8 +38,7 @@
  *
  *
  *************************************************************************/
-#if !defined(WELS_PLUS_WELSENCODEREXT_H)
-#define WELS_PLUS_WELSENCODEREXT_H
+#pragma once
 
 #include "codec_api.h"
 #include "codec_def.h"
@@ -54,38 +53,39 @@
 //#define DUMP_SRC_PICTURE
 //#define REC_FRAME_COUNT
 
-class ISVCEncoder;
-namespace WelsEnc {
-class CWelsH264SVCEncoder : public ISVCEncoder {
+
+namespace staaker {
+
+class OpenH264Encoder : public ISVCEncoder {
  public:
-  CWelsH264SVCEncoder();
-  virtual ~CWelsH264SVCEncoder();
+  OpenH264Encoder();
+  ~OpenH264Encoder() override;
 
   /* Interfaces override from ISVCEncoder */
   /*
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI Initialize (const SEncParamBase* argv);
-  virtual int EXTAPI InitializeExt (const SEncParamExt* argv);
+  int EXTAPI Initialize (const SEncParamBase* argv) override;
+  int EXTAPI InitializeExt (const SEncParamExt* argv) override;
 
-  virtual int EXTAPI GetDefaultParams (SEncParamExt* argv);
+  int EXTAPI GetDefaultParams (SEncParamExt* argv) override;
 
-  virtual int EXTAPI Uninitialize();
-
-  /*
-   * return: 0 - success; otherwise - failed;
-   */
-  virtual int EXTAPI EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
-  virtual int        EncodeFrameInternal (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
+  int EXTAPI Uninitialize() override;
 
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo);
+  int EXTAPI EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) override;
+  int        EncodeFrameInternal (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo);
+
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI ForceIntraFrame (bool bIDR,int32_t iLayerId = -1);
+  int EXTAPI EncodeParameterSets (SFrameBSInfo* pBsInfo) override;
+  /*
+   * return: 0 - success; otherwise - failed;
+   */
+  int EXTAPI ForceIntraFrame (bool bIDR,int32_t iLayerId = -1) override;
 
   /************************************************************************
    * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
@@ -93,8 +93,8 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   /*
    * return: CM_RETURN: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI SetOption (ENCODER_OPTION opt_id, void* option);
-  virtual int EXTAPI GetOption (ENCODER_OPTION opt_id, void* option);
+  int EXTAPI SetOption (ENCODER_OPTION opt_id, void* option) override;
+  int EXTAPI GetOption (ENCODER_OPTION opt_id, void* option) override;
 
  private:
   int InitializeInternal (SWelsSvcCodingParam* argv);
@@ -102,7 +102,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   void LogStatistics (const int64_t kiCurrentFrameTs,int32_t iMaxDid);
   void UpdateStatistics(SFrameBSInfo* pBsInfo, const int64_t kiCurrentFrameMs);
 
-  sWelsEncCtx*      m_pEncContext;
+  sWelsEncCtx      m_pEncContext;
 
   welsCodecTrace*   m_pWelsTrace;
   int32_t           m_iMaxPicWidth;
@@ -126,4 +126,3 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   void    DumpSrcPicture (const SSourcePicture*  pSrcPic, const int iUsageType);
 };
 }
-#endif // !defined(WELS_PLUS_WELSENCODEREXT_H)

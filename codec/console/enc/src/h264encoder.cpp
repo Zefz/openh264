@@ -63,7 +63,7 @@
 #endif
 
 #include <iostream>
-#include <welsEncoderExt.h>
+#include <OpenH264Encoder.hpp>
 
 using namespace std;
 using namespace WelsEnc;
@@ -676,7 +676,8 @@ INSIDE_MEM_FREE:
  ****************************************************************************/
 int main (int argc, char** argv)
 {
-  CWelsH264SVCEncoder encoder;
+    staaker::OpenH264Encoder encoder;
+    printf("Encoder stack memory usage: %lu bytes\n", sizeof(encoder));
 
   if (argc > 2) {
     ProcessEncoding (&encoder, argc, argv);

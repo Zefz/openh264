@@ -268,10 +268,10 @@ void LoadBackFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx) {
 void InitBitStream (sWelsEncCtx* pEncCtx) {
   // for bitstream writing
   pEncCtx->iPosBsBuffer         = 0;    // reset bs pBuffer position
-  pEncCtx->pOut->iNalIndex      = 0;    // reset NAL index
-  pEncCtx->pOut->iLayerBsIndex  = 0;    // reset index of Layer Bs
+  pEncCtx->pOut.iNalIndex      = 0;    // reset NAL index
+  pEncCtx->pOut.iLayerBsIndex  = 0;    // reset index of Layer Bs
 
-  InitBits (&pEncCtx->pOut->sBsWrite, pEncCtx->pOut->pBsBuffer, pEncCtx->pOut->uiSize);
+  InitBits (&pEncCtx->pOut.sBsWrite, pEncCtx->pOut.pBsBuffer, pEncCtx->pOut.uiSize);
 }
 /*!
  * \brief   initialize frame coding
