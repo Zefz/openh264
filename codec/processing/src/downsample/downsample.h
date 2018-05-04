@@ -42,8 +42,8 @@
 #ifndef WELSVP_DOWNSAMPLE_H
 #define WELSVP_DOWNSAMPLE_H
 
+#include <Strategy.hpp>
 #include "util.h"
-#include "WelsFrameWork.h"
 #include "IWelsVP.h"
 #include "macros.h"
 

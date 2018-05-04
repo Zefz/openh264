@@ -156,7 +156,7 @@ int32_t WelsSampleSatdIntra4x4Combined3_c (uint8_t* pDec, int32_t iDecStride, ui
     uint8_t* pDst,
     int32_t* pBestMode, int32_t iLambda2, int32_t iLambda1, int32_t iLambda0) {
   int32_t iBestMode = -1;
-  int32_t iCurCost, iBestCost = INT_MAX;
+  int32_t iCurCost, iBestCost = std::numeric_limits<int32_t>::max();
   ENFORCE_STACK_ALIGN_2D (uint8_t, uiLocalBuffer, 3, 16, 16)
 
   WelsI4x4LumaPredDc_c (uiLocalBuffer[2], pDec, iDecStride);
@@ -191,7 +191,7 @@ extern void WelsIChromaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t iSt
 int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, uint8_t* pEncCb, int32_t iEncStride,
     int32_t* pBestMode, int32_t iLambda, uint8_t* pDstChroma, uint8_t* pDecCr, uint8_t* pEncCr) {
   int32_t iBestMode = -1;
-  int32_t iCurCost, iBestCost = INT_MAX;
+  int32_t iCurCost, iBestCost = std::numeric_limits<int32_t>::max();
 
   WelsIChromaPredV_c (pDstChroma, pDecCb, iDecStride);
   WelsIChromaPredV_c (pDstChroma + 64, pDecCr, iDecStride);
@@ -229,7 +229,7 @@ int32_t WelsSampleSatdIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, 
 int32_t WelsSampleSadIntra8x8Combined3_c (uint8_t* pDecCb, int32_t iDecStride, uint8_t* pEncCb, int32_t iEncStride,
     int32_t* pBestMode, int32_t iLambda, uint8_t* pDstChroma, uint8_t* pDecCr, uint8_t* pEncCr) {
   int32_t iBestMode = -1;
-  int32_t iCurCost, iBestCost = INT_MAX;
+  int32_t iCurCost, iBestCost = std::numeric_limits<int32_t>::max();
 
   WelsIChromaPredV_c (pDstChroma, pDecCb, iDecStride);
   WelsIChromaPredV_c (pDstChroma + 64, pDecCr, iDecStride);
@@ -271,7 +271,7 @@ extern void WelsI16x16LumaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t
 int32_t WelsSampleSatdIntra16x16Combined3_c (uint8_t* pDec, int32_t iDecStride, uint8_t* pEnc, int32_t iEncStride,
     int32_t* pBestMode, int32_t iLambda, uint8_t* pDst) {
   int32_t iBestMode = -1;
-  int32_t iCurCost, iBestCost = INT_MAX;
+  int32_t iCurCost, iBestCost = std::numeric_limits<int32_t>::max();
 
   WelsI16x16LumaPredV_c (pDst, pDec, iDecStride);
   iCurCost = WelsSampleSatd16x16_c (pDst, 16, pEnc, iEncStride);
@@ -303,7 +303,7 @@ int32_t WelsSampleSatdIntra16x16Combined3_c (uint8_t* pDec, int32_t iDecStride, 
 int32_t WelsSampleSadIntra16x16Combined3_c (uint8_t* pDec, int32_t iDecStride, uint8_t* pEnc, int32_t iEncStride,
     int32_t* pBestMode, int32_t iLambda, uint8_t* pDst) {
   int32_t iBestMode = -1;
-  int32_t iCurCost, iBestCost = INT_MAX;
+  int32_t iCurCost, iBestCost = std::numeric_limits<int32_t>::max();
 
   WelsI16x16LumaPredV_c (pDst, pDec, iDecStride);
   iCurCost = WelsSampleSad16x16_c (pDst, 16, pEnc, iEncStride);

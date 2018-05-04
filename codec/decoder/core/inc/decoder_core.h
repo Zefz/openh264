@@ -54,7 +54,7 @@ namespace WelsDec {
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h.
  */
-int32_t InitBsBuffer (PWelsDecoderContext pCtx);
+int32_t InitBsBuffer (SWelsDecoderContext& pCtx);
 
 /*
  * ExpandBsBuffer
@@ -63,7 +63,7 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx);
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h.
  */
-int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
+int32_t ExpandBsBuffer (SWelsDecoderContext& pCtx, const int32_t kiSrcLen);
 
 /*
  * ExpandBsLenBuffer
@@ -73,13 +73,13 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h.
  */
-int32_t ExpandBsLenBuffer (PWelsDecoderContext pCtx, const int32_t kiCurrLen);
+int32_t ExpandBsLenBuffer (SWelsDecoderContext& pCtx, const int32_t kiCurrLen);
 
 /*
  * CheckBsBuffer
  * Check if current buffer size is enough
  */
-int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
+int32_t CheckBsBuffer (SWelsDecoderContext& pCtx, const int32_t kiSrcLen);
 
 /*
  * WelsInitStaticMemory
@@ -89,24 +89,24 @@ int32_t CheckBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h.
  */
-int32_t WelsInitStaticMemory (PWelsDecoderContext pCtx);
+int32_t WelsInitStaticMemory (SWelsDecoderContext& pCtx);
 
 /*
  * WelsFreeStaticMemory
  * Free memory introduced in WelsInitStaticMemory at destruction of decoder.
  *
  */
-void WelsFreeStaticMemory (PWelsDecoderContext pCtx);
+void WelsFreeStaticMemory (SWelsDecoderContext& pCtx);
 
 /*!
  * \brief   request memory when maximal picture width and height are available
  */
-int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight);
+int32_t InitialDqLayersContext (SWelsDecoderContext& pCtx, const int32_t kiMaxWidth, const int32_t kiMaxHeight);
 
 /*!
  * \brief   free dq layer context memory related
  */
-void UninitialDqLayersContext (PWelsDecoderContext pCtx);
+void UninitialDqLayersContext (SWelsDecoderContext& pCtx);
 
 /*
  *  DecodeNalHeaderExt
@@ -121,13 +121,13 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc);
  *  ParseSliceHeaderSyntaxs
  *  Parse slice header of bitstream
  */
-int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag);
+int32_t ParseSliceHeaderSyntaxs (SWelsDecoderContext& pCtx, PBitStringAux pBs, const bool kbExtensionFlag);
 /*
  *  Copy relative syntax elements of NALUnitHeaderExt, sRefPicBaseMarking and bStoreRefBasePicFlag in prefix nal unit.
  *  pSrc:   mark as decoded prefix NAL
  *  pDst:   succeeded VCL NAL based AVC (I/P Slice)
  */
-bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
+bool PrefetchNalHeaderExtSyntax (SWelsDecoderContext& pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
 
 /*
@@ -142,35 +142,35 @@ bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst,
  * return:
  *  0 - success; otherwise returned error_no defined in error_no.h
  */
-int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
+int32_t ConstructAccessUnit (SWelsDecoderContext& pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
 
 
 /*
  * DecodeCurrentAccessUnit
  * Decode current access unit when current AU is completed.
  */
-int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
+int32_t DecodeCurrentAccessUnit (SWelsDecoderContext& pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
 
 /*
  * Check if frame is completed and EC is required
  */
-bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
+bool CheckAndFinishLastPic (SWelsDecoderContext& pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
 /*
  *  Prepare current dq layer context initialization.
  */
-void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps);
+void WelsDqLayerDecodeStart (SWelsDecoderContext& pCtx, PNalUnit pCurNal, PSps pSps, PPps pPps);
 
 
-int32_t WelsDecodeAccessUnitStart (PWelsDecoderContext pCtx);
-void WelsDecodeAccessUnitEnd (PWelsDecoderContext pCtx);
-void DecodeFinishUpdate (PWelsDecoderContext pCtx);
+int32_t WelsDecodeAccessUnitStart (SWelsDecoderContext& pCtx);
+void WelsDecodeAccessUnitEnd (SWelsDecoderContext& pCtx);
+void DecodeFinishUpdate (SWelsDecoderContext& pCtx);
 
 void ForceResetCurrentAccessUnit (PAccessUnit pAu);
 void ForceClearCurrentNal (PAccessUnit pAu);
 
-bool CheckRefPicturesComplete (PWelsDecoderContext pCtx); // Check whether all ref pictures are complete
+bool CheckRefPicturesComplete (SWelsDecoderContext& pCtx); // Check whether all ref pictures are complete
 
-void ForceResetParaSetStatusAndAUList(PWelsDecoderContext pCtx);
+void ForceResetParaSetStatusAndAUList(SWelsDecoderContext& pCtx);
 } // namespace WelsDec
 
 #endif//WELS_DECODER_CORE_H__

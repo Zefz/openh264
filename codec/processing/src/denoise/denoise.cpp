@@ -35,7 +35,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#define CALC_BI_STRIDE(iWidth, iBitcount)  ((((iWidth) * (iBitcount) + 31) & ~31) >> 3)
+//#define CALC_BI_STRIDE(iWidth, iBitcount)  ((((iWidth) * (iBitcount) + 31) & ~31) >> 3)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

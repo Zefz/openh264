@@ -63,7 +63,7 @@ public:
     virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
 private:
-    SWelsDecoderContext     m_pDecContext;
+    SWelsDecoderContext     _decoderContext;
     welsCodecTrace          m_pWelsTrace;
     SDecodingParam          _decodingParameters;
 

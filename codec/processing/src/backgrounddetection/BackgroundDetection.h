@@ -41,9 +41,9 @@
 #ifndef WELSVP_BACKGROUNDDETECTION_H
 #define WELSVP_BACKGROUNDDETECTION_H
 
+#include <Strategy.hpp>
 #include "util.h"
 #include "memory.h"
-#include "WelsFrameWork.h"
 #include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN

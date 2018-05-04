@@ -1072,23 +1072,7 @@ int OpenH264Encoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
   }
   break;
-  case ENCODER_OPTION_TRACE_CALLBACK: {
-    if (m_pWelsTrace) {
-      WelsTraceCallback callback = * ((WelsTraceCallback*)pOption);
-      m_pWelsTrace->SetTraceCallback (callback);
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-               "OpenH264Encoder::SetOption():ENCODER_OPTION_TRACE_CALLBACK callback = %p.",
-               callback);
-    }
-  }
-  break;
-  case ENCODER_OPTION_TRACE_CALLBACK_CONTEXT: {
-    if (m_pWelsTrace) {
-      void* ctx = * ((void**)pOption);
-      m_pWelsTrace->SetTraceCallbackContext (ctx);
-    }
-  }
-  break;
+
   case ENCODER_OPTION_PROFILE: {
     SProfileInfo* pProfileInfo = (static_cast<SProfileInfo*> (pOption));
     if ((pProfileInfo->iLayer < SPATIAL_LAYER_0) || (pProfileInfo->iLayer > SPATIAL_LAYER_3)) {

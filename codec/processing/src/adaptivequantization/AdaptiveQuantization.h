@@ -41,9 +41,9 @@
 #ifndef WELSVP_ADAPTIVEQUANTIZATION_H
 #define WELSVP_ADAPTIVEQUANTIZATION_H
 
+#include <Strategy.hpp>
 #include "util.h"
 #include "memory.h"
-#include "WelsFrameWork.h"
 #include "IWelsVP.h"
 #include "cpu.h"
 

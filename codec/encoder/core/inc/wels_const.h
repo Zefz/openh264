@@ -60,7 +60,7 @@
 #define MAX_FRAME_RATE                  60      // maximal frame rate to support
 #define MIN_FRAME_RATE                  1       // minimal frame rate need support
 
-#define MAX_BIT_RATE                    INT_MAX // maximal bit rate to support
+#define MAX_BIT_RATE                    std::numeric_limits<int32_t>::max() // maximal bit rate to support
 //TODO {Sijia}: 30fps*MaxCPB in level5.1 = 30*240000*1000bits = 7 200 000 000, larger than INT_MAX which is 2147483647, but this is also very big and abnormal number, should figure out a reasonable number after discussion
 #define MIN_BIT_RATE                    1       // minimal bit rate need support
 

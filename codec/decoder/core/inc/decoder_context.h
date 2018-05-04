@@ -449,12 +449,12 @@ typedef struct TagWelsDecoderContext {
   int iDequantCoeffPpsid;//When a new pps actived, reinitialised the scaling list value
   bool bDequantCoeff4x4Init;
   bool bUseScalingList;
-} SWelsDecoderContext, *PWelsDecoderContext;
+} SWelsDecoderContext;
 
-static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
-  if (pCtx->iTotalNumMbRec == 0) {
+static inline void ResetActiveSPSForEachLayer (SWelsDecoderContext& pCtx) {
+  if (pCtx.iTotalNumMbRec == 0) {
     for (int i = 0; i < MAX_LAYER_NUM; i++) {
-      pCtx->pActiveLayerSps[i] = NULL;
+      pCtx.pActiveLayerSps[i] = nullptr;
     }
   }
 }

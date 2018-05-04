@@ -39,7 +39,6 @@
 #include <random>
 #include <iostream>
 #include <chrono>
-#include <welsDecoderExt.h>
 #include <OpenH264Decoder.hpp>
 #include <codec_app_def.h>
 

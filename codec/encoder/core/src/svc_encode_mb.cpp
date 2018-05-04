@@ -278,7 +278,7 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
         else if (iSingleCtr8x8 < 7)
           iSingleCtr8x8 += pfCalculateSingleCtr4x4 (pBlock);
       } else
-        iSingleCtr8x8 = INT_MAX;
+        iSingleCtr8x8 = std::numeric_limits<int32_t>::max();
     }
     pRes += 16;
     pBlock += 16;

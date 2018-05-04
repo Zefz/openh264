@@ -38,7 +38,7 @@ file(GLOB_RECURSE DECODER_SOURCES
         )
 
 add_library(decoder STATIC ${DECODER_SOURCES})
-target_compile_options(decoder PRIVATE -O3 -Wno-format -fno-strict-aliasing -fPIC)
+target_compile_options(decoder PRIVATE -O3 -Wno-format -fno-strict-aliasing)
 
 target_include_directories(decoder PRIVATE
         ${PROJECT_SOURCE_DIR}/codec/decoder/core/inc

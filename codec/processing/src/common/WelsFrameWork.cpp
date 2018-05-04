@@ -30,91 +30,45 @@
  *
  */
 
+#include <iostream>
 #include "WelsFrameWork.h"
-#include "../denoise/denoise.h"
-#include "../downsample/downsample.h"
-#include "../scrolldetection/ScrollDetection.h"
-#include "../scenechangedetection/SceneChangeDetection.h"
-#include "../vaacalc/vaacalculation.h"
-#include "../backgrounddetection/BackgroundDetection.h"
-#include "../adaptivequantization/AdaptiveQuantization.h"
-#include "../complexityanalysis/ComplexityAnalysis.h"
-#include "../imagerotate/imagerotate.h"
-#include "util.h"
-
-/* interface API implement */
-
-EResult WelsCreateVpInterface (void** ppCtx, int iVersion) {
-  if (iVersion & 0x8000)
-    return WelsVP::CreateSpecificVpInterface ((IWelsVP**)ppCtx);
-  else if (iVersion & 0x7fff)
-    return WelsVP::CreateSpecificVpInterface ((IWelsVPc**)ppCtx);
-  else
-    return RET_INVALIDPARAM;
-}
-
-EResult WelsDestroyVpInterface (void* pCtx, int iVersion) {
-  if (iVersion & 0x8000)
-    return WelsVP::DestroySpecificVpInterface ((IWelsVP*)pCtx);
-  else if (iVersion & 0x7fff)
-    return WelsVP::DestroySpecificVpInterface ((IWelsVPc*)pCtx);
-  else
-    return RET_INVALIDPARAM;
-}
 
 WELSVP_NAMESPACE_BEGIN
 
-///////////////////////////////////////////////////////////////////////
-
-EResult CreateSpecificVpInterface (IWelsVP** ppCtx) {
-  EResult  eReturn = RET_FAILED;
-
-  CVpFrameWork* pFr = new CVpFrameWork (1, eReturn);
-  if (pFr) {
-    *ppCtx  = (IWelsVP*)pFr;
-    eReturn = RET_SUCCESS;
-  }
-
-  return eReturn;
-}
-
-EResult DestroySpecificVpInterface (IWelsVP* pCtx) {
-  delete pCtx;
-
-  return RET_SUCCESS;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
-CVpFrameWork::CVpFrameWork (uint32_t uiThreadsNum, EResult& eReturn) {
-  int32_t iCoreNum = 1;
-  uint32_t uiCPUFlag = WelsCPUFeatureDetect (&iCoreNum);
-
-  for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
-    m_pStgChain[i] = CreateStrategy (WelsStaticCast (EMethods, i + 1), uiCPUFlag);
-  }
-
-  eReturn = RET_SUCCESS;
+CVpFrameWork::CVpFrameWork() :
+    _denoiser{0},
+    _sceneChangeDetectorVideo{METHOD_SCENE_CHANGE_DETECTION_VIDEO, 0},
+    _sceneChangeDetectorScreen{METHOD_SCENE_CHANGE_DETECTION_SCREEN, 0},
+    _downsampling{0},
+    _vaaCalculation{0},
+    _backgroundDetection{0},
+    _adaptiveQuantization{0},
+    _complexityAnalysis{0},
+    _complexityAnalysisScreen{0},
+    _rotating{0},
+    _scrollDetection{0}
+{
+    //ctor
 }
 
 CVpFrameWork::~CVpFrameWork() {
   for (int32_t i = 0; i < MAX_STRATEGY_NUM; i++) {
-    if (m_pStgChain[i]) {
-      Uninit (m_pStgChain[i]->m_eMethod);
-      delete m_pStgChain[i];
-    }
+        auto *result = getStrategy(static_cast<EMethods>(i));
+        if (result) {
+          Uninit (result->m_eMethod);
+        }
   }
 
 }
 
 EResult CVpFrameWork::Init (int32_t iType, void* pCfg) {
   EResult eReturn   = RET_SUCCESS;
-  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
   Uninit (iType);
 
-
-  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  IStrategy* pStrategy = getStrategy(static_cast<EMethods>(iType));
   if (pStrategy)
     eReturn = pStrategy->Init (0, pCfg);
 
@@ -124,10 +78,8 @@ EResult CVpFrameWork::Init (int32_t iType, void* pCfg) {
 
 EResult CVpFrameWork::Uninit (int32_t iType) {
   EResult eReturn        = RET_SUCCESS;
-  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
-
-  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  IStrategy* pStrategy = getStrategy(static_cast<EMethods>(iType));
   if (pStrategy)
     eReturn = pStrategy->Uninit (0);
 
@@ -144,7 +96,6 @@ EResult CVpFrameWork::Flush (int32_t iType) {
 EResult CVpFrameWork::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDstPixMap) {
   EResult eReturn        = RET_NOTSUPPORTED;
   EMethods eMethod    = WelsVpGetValidMethod (iType);
-  int32_t iCurIdx    = WelsStaticCast (int32_t, eMethod) - 1;
   SPixMap sSrcPic;
   SPixMap sDstPic;
   memset (&sSrcPic, 0, sizeof (sSrcPic)); // confirmed_safe_unsafe_usage
@@ -156,7 +107,7 @@ EResult CVpFrameWork::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDst
     return RET_INVALIDPARAM;
 
 
-  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+  IStrategy* pStrategy = getStrategy(static_cast<EMethods>(iType));
   if (pStrategy)
     eReturn = pStrategy->Process (0, &sSrcPic, &sDstPic);
 
@@ -166,14 +117,13 @@ EResult CVpFrameWork::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDst
 
 EResult CVpFrameWork::Get (int32_t iType, void* pParam) {
   EResult eReturn        = RET_SUCCESS;
-  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
 
   if (!pParam)
     return RET_INVALIDPARAM;
 
 
-  IStrategy* pStrategy = m_pStgChain[iCurIdx];
-  if (pStrategy)
+    IStrategy* pStrategy = getStrategy(static_cast<EMethods>(iType));
+    if (pStrategy)
     eReturn = pStrategy->Get (0, pParam);
 
 
@@ -182,13 +132,13 @@ EResult CVpFrameWork::Get (int32_t iType, void* pParam) {
 
 EResult CVpFrameWork::Set (int32_t iType, void* pParam) {
   EResult eReturn        = RET_SUCCESS;
-  int32_t iCurIdx    = WelsStaticCast (int32_t, WelsVpGetValidMethod (iType)) - 1;
+  const int32_t iCurIdx = static_cast<int32_t>(iType % METHOD_MASK) - 1;
 
   if (!pParam)
     return RET_INVALIDPARAM;
 
 
-  IStrategy* pStrategy = m_pStgChain[iCurIdx];
+    IStrategy* pStrategy = getStrategy(static_cast<EMethods>(iType));
   if (pStrategy)
     eReturn = pStrategy->Set (0, pParam);
 
@@ -241,49 +191,52 @@ exit:
   return eReturn;
 }
 
-IStrategy* CVpFrameWork::CreateStrategy (EMethods m_eMethod, int32_t iCpuFlag) {
-  IStrategy* pStrategy = NULL;
+IStrategy *CVpFrameWork::getStrategy(const EMethods eMethod) {
 
-  switch (m_eMethod) {
-  case METHOD_COLORSPACE_CONVERT:
-    //not support yet
-    break;
-  case METHOD_DENOISE:
-    pStrategy = WelsDynamicCast (IStrategy*, new CDenoiser (iCpuFlag));
-    break;
-  case METHOD_SCROLL_DETECTION:
-    pStrategy = WelsDynamicCast (IStrategy*, new CScrollDetection (iCpuFlag));
-    break;
-  case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
-  case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
-    pStrategy = BuildSceneChangeDetection (m_eMethod, iCpuFlag);
-    break;
-  case METHOD_DOWNSAMPLE:
-    pStrategy = WelsDynamicCast (IStrategy*, new CDownsampling (iCpuFlag));
-    break;
-  case METHOD_VAA_STATISTICS:
-    pStrategy = WelsDynamicCast (IStrategy*, new CVAACalculation (iCpuFlag));
-    break;
-  case METHOD_BACKGROUND_DETECTION:
-    pStrategy = WelsDynamicCast (IStrategy*, new CBackgroundDetection (iCpuFlag));
-    break;
-  case METHOD_ADAPTIVE_QUANT:
-    pStrategy = WelsDynamicCast (IStrategy*, new CAdaptiveQuantization (iCpuFlag));
-    break;
-  case METHOD_COMPLEXITY_ANALYSIS:
-    pStrategy = WelsDynamicCast (IStrategy*, new CComplexityAnalysis (iCpuFlag));
-    break;
-  case METHOD_COMPLEXITY_ANALYSIS_SCREEN:
-    pStrategy = WelsDynamicCast (IStrategy*, new CComplexityAnalysisScreen (iCpuFlag));
-    break;
-  case METHOD_IMAGE_ROTATE:
-    pStrategy = WelsDynamicCast (IStrategy*, new CImageRotating (iCpuFlag));
-    break;
-  default:
-    break;
-  }
+    switch(eMethod) {
+        case METHOD_NULL:
+            return nullptr;
 
-  return pStrategy;
+        case METHOD_COLORSPACE_CONVERT:
+            //not implemented
+            return nullptr;
+
+        case METHOD_DENOISE:
+            return &_denoiser;
+
+        case METHOD_SCENE_CHANGE_DETECTION_VIDEO:
+            return &_sceneChangeDetectorVideo;
+
+        case METHOD_SCENE_CHANGE_DETECTION_SCREEN:
+            return &_sceneChangeDetectorScreen;
+
+        case METHOD_DOWNSAMPLE:
+            return &_downsampling;
+
+        case METHOD_VAA_STATISTICS:
+            return &_vaaCalculation;
+
+        case METHOD_BACKGROUND_DETECTION:
+            return &_backgroundDetection;
+
+        case METHOD_ADAPTIVE_QUANT:
+            return &_adaptiveQuantization;
+
+        case METHOD_COMPLEXITY_ANALYSIS:
+            return &_complexityAnalysis;
+
+        case METHOD_COMPLEXITY_ANALYSIS_SCREEN:
+            return &_complexityAnalysisScreen;
+
+        case METHOD_IMAGE_ROTATE:
+            return &_rotating;
+
+        case METHOD_SCROLL_DETECTION:
+            return &_scrollDetection;
+
+        case METHOD_MASK:
+            return nullptr;
+    }
 }
 
 WELSVP_NAMESPACE_END

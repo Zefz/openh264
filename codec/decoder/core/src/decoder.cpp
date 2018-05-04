@@ -59,11 +59,11 @@ namespace WelsDec {
 //Destroy picutre buffer
 static void DestroyPicBuff(SPicBuff& ppPicBuf);
 
-extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
+extern PPicture AllocPicture (SWelsDecoderContext& pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
 
 extern void FreePicture (PPicture pPic);
 
-static int32_t CreatePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuff, const int32_t kiSize,
+static int32_t CreatePicBuff (SWelsDecoderContext& pCtx, SPicBuff& sPicBuff, const int32_t kiSize,
                               const int32_t kiPicWidth, const int32_t kiPicHeight) {
   int32_t iPicIdx = 0;
   if (kiSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
@@ -96,7 +96,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuff, cons
   return ERR_NONE;
 }
 
-static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuf, const int32_t kiOldSize,
+static int32_t IncreasePicBuff (SWelsDecoderContext& pCtx, SPicBuff& sPicBuf, const int32_t kiOldSize,
                                 const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
   int32_t iPicIdx = 0;
   if (kiOldSize <= 0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
@@ -137,7 +137,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, SPicBuff& sPicBuf, con
   return ERR_NONE;
 }
 
-static int32_t DecreasePicBuff (PWelsDecoderContext pCtx,  SPicBuff& sPicBuf, const int32_t kiOldSize,
+static int32_t DecreasePicBuff (SWelsDecoderContext& pCtx,  SPicBuff& sPicBuf, const int32_t kiOldSize,
                                 const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
   int32_t iPicIdx = 0;
   if (kiOldSize <= 0 || kiNewSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
@@ -146,7 +146,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx,  SPicBuff& sPicBuf, co
 
   int32_t iPrevPicIdx;
   for (iPrevPicIdx = 0; iPrevPicIdx < kiOldSize; ++iPrevPicIdx) {
-    if (pCtx->pPreviousDecodedPictureInDpb == sPicBuf.ppPic[iPrevPicIdx]) {
+    if (pCtx.pPreviousDecodedPictureInDpb == sPicBuf.ppPic[iPrevPicIdx]) {
       break;
     }
   }
@@ -202,54 +202,54 @@ static void DestroyPicBuff(SPicBuff &sPicBuff) {
 /*
  * fill data fields in default for decoder context
  */
-void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+void WelsDecoderDefaults (SWelsDecoderContext& pCtx, SLogContext* pLogCtx) {
   int32_t iCpuCores               = 1;
-  pCtx->sLogCtx = *pLogCtx;
+  pCtx.sLogCtx = *pLogCtx;
 
-  pCtx->pArgDec                   = NULL;
+  pCtx.pArgDec                   = NULL;
 
-  pCtx->bHaveGotMemory            = false;              // not ever request memory blocks for decoder context related
-  pCtx->uiCpuFlag                 = 0;
+  pCtx.bHaveGotMemory            = false;              // not ever request memory blocks for decoder context related
+  pCtx.uiCpuFlag                 = 0;
 
-  pCtx->bAuReadyFlag              = 0;                  // au data is not ready
-  pCtx->bCabacInited = false;
+  pCtx.bAuReadyFlag              = 0;                  // au data is not ready
+  pCtx.bCabacInited = false;
 
-  pCtx->uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
+  pCtx.uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores);
 
-  pCtx->iImgWidthInPixel          = 0;
-  pCtx->iImgHeightInPixel         = 0;                  // alloc picture data when picture size is available
-  pCtx->iLastImgWidthInPixel      = 0;
-  pCtx->iLastImgHeightInPixel     = 0;
-  pCtx->bFreezeOutput = true;
+  pCtx.iImgWidthInPixel          = 0;
+  pCtx.iImgHeightInPixel         = 0;                  // alloc picture data when picture size is available
+  pCtx.iLastImgWidthInPixel      = 0;
+  pCtx.iLastImgHeightInPixel     = 0;
+  pCtx.bFreezeOutput = true;
 
-  pCtx->iFrameNum                 = -1;
-  pCtx->iPrevFrameNum             = -1;
-  pCtx->iErrorCode                = ERR_NONE;
+  pCtx.iFrameNum                 = -1;
+  pCtx.iPrevFrameNum             = -1;
+  pCtx.iErrorCode                = ERR_NONE;
 
-  pCtx->pDec                      = NULL;
+  pCtx.pDec                      = NULL;
 
   WelsResetRefPic (pCtx);
 
-  pCtx->iActiveFmoNum             = 0;
+  pCtx.iActiveFmoNum             = 0;
 
-  pCtx->sPicBuff[LIST_0]          = {};
-  pCtx->sPicBuff[LIST_1]          = {};
+  pCtx.sPicBuff[LIST_0]          = {};
+  pCtx.sPicBuff[LIST_1]          = {};
 
-  pCtx->bAvcBasedFlag             = true;
-  pCtx->pPreviousDecodedPictureInDpb = NULL;
-  pCtx->sDecoderStatistics.iAvgLumaQp = -1;
-  pCtx->sDecoderStatistics.iStatisticsLogInterval = 1000;
-  pCtx->bUseScalingList = false;
-  pCtx->iSpsErrorIgnored = 0;
-  pCtx->iSubSpsErrorIgnored = 0;
-  pCtx->iPpsErrorIgnored = 0;
-  pCtx->iPPSInvalidNum = 0;
-  pCtx->iPPSLastInvalidId = -1;
-  pCtx->iSPSInvalidNum = 0;
-  pCtx->iSPSLastInvalidId = -1;
-  pCtx->iSubSPSInvalidNum = 0;
-  pCtx->iSubSPSLastInvalidId = -1;
-  pCtx->iFeedbackNalRefIdc = -1; //initialize
+  pCtx.bAvcBasedFlag             = true;
+  pCtx.pPreviousDecodedPictureInDpb = NULL;
+  pCtx.sDecoderStatistics.iAvgLumaQp = -1;
+  pCtx.sDecoderStatistics.iStatisticsLogInterval = 1000;
+  pCtx.bUseScalingList = false;
+  pCtx.iSpsErrorIgnored = 0;
+  pCtx.iSubSpsErrorIgnored = 0;
+  pCtx.iPpsErrorIgnored = 0;
+  pCtx.iPPSInvalidNum = 0;
+  pCtx.iPPSLastInvalidId = -1;
+  pCtx.iSPSInvalidNum = 0;
+  pCtx.iSPSLastInvalidId = -1;
+  pCtx.iSubSPSInvalidNum = 0;
+  pCtx.iSubSPSLastInvalidId = -1;
+  pCtx.iFeedbackNalRefIdc = -1; //initialize
 
 }
 
@@ -261,13 +261,13 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 /*
  *  get size of reference picture list in target layer incoming, = (iNumRefFrames
  */
-static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
+static inline int32_t GetTargetRefListSize (SWelsDecoderContext& pCtx) {
   int32_t iNumRefFrames = 0;
   // +2 for EC MV Copy buffer exchange
-  if ((pCtx == NULL) || (pCtx->pSps == NULL)) {
+  if (pCtx.pSps == NULL) {
     iNumRefFrames = MAX_REF_PIC_COUNT + 2;
   } else {
-    iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
+    iNumRefFrames = pCtx.pSps->iNumRefFrames + 2;
   }
 
 #ifdef LONG_TERM_REF
@@ -283,7 +283,7 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
 /*
  *  request memory blocks for decoder avc part
  */
-int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight,
+int32_t WelsRequestMem (SWelsDecoderContext& pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight,
                         bool& bReallocFlag) {
   const int32_t kiPicWidth      = kiMbWidth << 4;
   const int32_t kiPicHeight     = kiMbHeight << 4;
@@ -294,63 +294,63 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   bReallocFlag                  = false;
   bool  bNeedChangePicQueue     = true;
 
-  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pCtx || kiPicWidth <= 0 || kiPicHeight <= 0))
+  WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (kiPicWidth <= 0 || kiPicHeight <= 0))
 
   // Fixed the issue about different gop size over last, 5/17/2010
   // get picture queue size currently
   iPicQueueSize = GetTargetRefListSize (pCtx);  // adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
-  pCtx->iPicQueueNumber = iPicQueueSize;
-  if (pCtx->sPicBuff[LIST_0].iCapacity == iPicQueueSize) // comparing current picture queue size requested and previous allocation picture queue
+  pCtx.iPicQueueNumber = iPicQueueSize;
+  if (pCtx.sPicBuff[LIST_0].iCapacity == iPicQueueSize) // comparing current picture queue size requested and previous allocation picture queue
     bNeedChangePicQueue = false;
   // HD based pic buffer need consider memory size consumed when switch from 720p to other lower size
-  WELS_VERIFY_RETURN_IF (ERR_NONE, pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel
-                         && kiPicHeight == pCtx->iImgHeightInPixel) && (!bNeedChangePicQueue)) // have same scaled buffer
+  WELS_VERIFY_RETURN_IF (ERR_NONE, pCtx.bHaveGotMemory && (kiPicWidth == pCtx.iImgWidthInPixel
+                         && kiPicHeight == pCtx.iImgHeightInPixel) && (!bNeedChangePicQueue)) // have same scaled buffer
 
   // sync update pRefList
   WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
 
-  if (pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
-      && pCtx->sPicBuff[LIST_0].iCapacity != iPicQueueSize) {
+  if (pCtx.bHaveGotMemory && (kiPicWidth == pCtx.iImgWidthInPixel && kiPicHeight == pCtx.iImgHeightInPixel)
+      && pCtx.sPicBuff[LIST_0].iCapacity != iPicQueueSize) {
     // currently only active for LIST_0 due to have no B frames
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+    WelsLog (& (pCtx.sLogCtx), WELS_LOG_INFO,
              "WelsRequestMem(): memory re-alloc for no resolution change (size = %d * %d), ref list size change from %d to %d",
-             kiPicWidth, kiPicHeight, pCtx->sPicBuff[LIST_0].iCapacity, iPicQueueSize);
-    if (pCtx->sPicBuff[LIST_0].iCapacity < iPicQueueSize) {
-      iErr = IncreasePicBuff (pCtx, pCtx->sPicBuff[LIST_0], pCtx->sPicBuff[LIST_0].iCapacity, kiPicWidth, kiPicHeight,
+             kiPicWidth, kiPicHeight, pCtx.sPicBuff[LIST_0].iCapacity, iPicQueueSize);
+    if (pCtx.sPicBuff[LIST_0].iCapacity < iPicQueueSize) {
+      iErr = IncreasePicBuff (pCtx, pCtx.sPicBuff[LIST_0], pCtx.sPicBuff[LIST_0].iCapacity, kiPicWidth, kiPicHeight,
                               iPicQueueSize);
     } else {
-      iErr = DecreasePicBuff (pCtx, pCtx->sPicBuff[LIST_0], pCtx->sPicBuff[LIST_0].iCapacity, kiPicWidth, kiPicHeight,
+      iErr = DecreasePicBuff (pCtx, pCtx.sPicBuff[LIST_0], pCtx.sPicBuff[LIST_0].iCapacity, kiPicWidth, kiPicHeight,
                               iPicQueueSize);
     }
   } else {
-    if (pCtx->bHaveGotMemory)
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+    if (pCtx.bHaveGotMemory)
+      WelsLog (& (pCtx.sLogCtx), WELS_LOG_INFO,
                "WelsRequestMem(): memory re-alloc for resolution change, size change from %d * %d to %d * %d, ref list size change from %d to %d",
-               pCtx->iImgWidthInPixel, pCtx->iImgHeightInPixel, kiPicWidth, kiPicHeight, pCtx->sPicBuff[LIST_0].iCapacity,
+               pCtx.iImgWidthInPixel, pCtx.iImgHeightInPixel, kiPicWidth, kiPicHeight, pCtx.sPicBuff[LIST_0].iCapacity,
                iPicQueueSize);
     else
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "WelsRequestMem(): memory alloc size = %d * %d, ref list size = %d",
+      WelsLog (& (pCtx.sLogCtx), WELS_LOG_INFO, "WelsRequestMem(): memory alloc size = %d * %d, ref list size = %d",
                kiPicWidth, kiPicHeight, iPicQueueSize);
     // for Recycled_Pic_Queue
     for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
-      DestroyPicBuff (pCtx->sPicBuff[iListIdx]);
+      DestroyPicBuff (pCtx.sPicBuff[iListIdx]);
     }
 
-    pCtx->pPreviousDecodedPictureInDpb = NULL;
+    pCtx.pPreviousDecodedPictureInDpb = NULL;
 
     // currently only active for LIST_0 due to have no B frames
-    iErr = CreatePicBuff (pCtx, pCtx->sPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
+    iErr = CreatePicBuff (pCtx, pCtx.sPicBuff[LIST_0], iPicQueueSize, kiPicWidth, kiPicHeight);
   }
 
   if (iErr != ERR_NONE)
     return iErr;
 
 
-  pCtx->iImgWidthInPixel    = kiPicWidth;   // target width of image to be reconstruted while decoding
-  pCtx->iImgHeightInPixel   = kiPicHeight;  // target height of image to be reconstruted while decoding
+  pCtx.iImgWidthInPixel    = kiPicWidth;   // target width of image to be reconstruted while decoding
+  pCtx.iImgHeightInPixel   = kiPicHeight;  // target height of image to be reconstruted while decoding
 
-  pCtx->bHaveGotMemory      = true;         // global memory for decoder context related is requested
-  pCtx->pDec                = NULL;         // need prefetch a new pic due to spatial size changed
+  pCtx.bHaveGotMemory      = true;         // global memory for decoder context related is requested
+  pCtx.pDec                = NULL;         // need prefetch a new pic due to spatial size changed
 
   bReallocFlag              = true;         // memory re-allocation successfully finished
   return ERR_NONE;
@@ -359,7 +359,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 /*
  *  free memory dynamically allocated during decoder
  */
-void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
+void WelsFreeDynamicMemory (SWelsDecoderContext& pCtx) {
   int32_t iListIdx = 0;
 
   //free dq layer memory
@@ -371,95 +371,95 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   //free ref-pic list & picture memory
   WelsResetRefPic (pCtx);
   for (iListIdx = LIST_0; iListIdx < LIST_A; ++ iListIdx) {
-    DestroyPicBuff (pCtx->sPicBuff[iListIdx]);
+    DestroyPicBuff (pCtx.sPicBuff[iListIdx]);
   }
 
   // added for safe memory
-  pCtx->iImgWidthInPixel  = 0;
-  pCtx->iImgHeightInPixel = 0;
-  pCtx->iLastImgWidthInPixel  = 0;
-  pCtx->iLastImgHeightInPixel = 0;
-  pCtx->bFreezeOutput = true;
-  pCtx->bHaveGotMemory = false;
+  pCtx.iImgWidthInPixel  = 0;
+  pCtx.iImgHeightInPixel = 0;
+  pCtx.iLastImgWidthInPixel  = 0;
+  pCtx.iLastImgHeightInPixel = 0;
+  pCtx.bFreezeOutput = true;
+  pCtx.bHaveGotMemory = false;
 }
 
 /*!
  * \brief   Open decoder
  */
-int32_t WelsOpenDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+int32_t WelsOpenDecoder (SWelsDecoderContext& pCtx, SLogContext* pLogCtx) {
   int iRet = ERR_NONE;
   // function pointers
-  InitDecFuncs (pCtx, pCtx->uiCpuFlag);
+  InitDecFuncs (pCtx, pCtx.uiCpuFlag);
 
   // vlc tables
-  InitVlcTable (&pCtx->sVlcTable);
+  InitVlcTable (&pCtx.sVlcTable);
 
   // static memory
   iRet = WelsInitStaticMemory (pCtx);
   if (ERR_NONE != iRet) {
-    pCtx->iErrorCode |= dsOutOfMemory;
+    pCtx.iErrorCode |= dsOutOfMemory;
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitStaticMemory() failed in WelsOpenDecoder().");
     return iRet;
   }
 
 #ifdef LONG_TERM_REF
-  pCtx->bParamSetsLostFlag = true;
+  pCtx.bParamSetsLostFlag = true;
 #else
-  pCtx->bReferenceLostAtT0Flag = true; // should be true to waiting IDR at incoming AU bits following, 6/4/2010
+  pCtx.bReferenceLostAtT0Flag = true; // should be true to waiting IDR at incoming AU bits following, 6/4/2010
 #endif //LONG_TERM_REF
-  pCtx->bNewSeqBegin = true;
-  pCtx->bPrintFrameErrorTraceFlag = true;
-  pCtx->iIgnoredErrorInfoPacketCount = 0;
-  pCtx->bFrameFinish = true;
+  pCtx.bNewSeqBegin = true;
+  pCtx.bPrintFrameErrorTraceFlag = true;
+  pCtx.iIgnoredErrorInfoPacketCount = 0;
+  pCtx.bFrameFinish = true;
   return iRet;
 }
 
 /*!
  * \brief   Close decoder
  */
-void WelsCloseDecoder (PWelsDecoderContext pCtx) {
+void WelsCloseDecoder (SWelsDecoderContext& pCtx) {
   WelsFreeDynamicMemory (pCtx);
 
   WelsFreeStaticMemory (pCtx);
 
 #ifdef LONG_TERM_REF
-  pCtx->bParamSetsLostFlag       = false;
+  pCtx.bParamSetsLostFlag       = false;
 #else
-  pCtx->bReferenceLostAtT0Flag = false;
+  pCtx.bReferenceLostAtT0Flag = false;
 #endif
-  pCtx->bNewSeqBegin = false;
-  pCtx->bPrintFrameErrorTraceFlag = false;
+  pCtx.bNewSeqBegin = false;
+  pCtx.bPrintFrameErrorTraceFlag = false;
 }
 
 /*!
  * \brief   configure decoder parameters
  */
-int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam) {
-  if (NULL == pCtx || NULL == kpParam)
+int32_t DecoderConfigParam (SWelsDecoderContext& pCtx, const SDecodingParam* kpParam) {
+  if (NULL == kpParam)
     return ERR_INFO_INVALID_PARAM;
 
-  memcpy (pCtx->pParam, kpParam, sizeof (SDecodingParam));
-  if ((pCtx->pParam->eEcActiveIdc > ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
-      || (pCtx->pParam->eEcActiveIdc < ERROR_CON_DISABLE)) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "eErrorConMethod (%d) not in range: (%d - %d). Set as default value: (%d).", pCtx->pParam->eEcActiveIdc,
+  memcpy (pCtx.pParam, kpParam, sizeof (SDecodingParam));
+  if ((pCtx.pParam->eEcActiveIdc > ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
+      || (pCtx.pParam->eEcActiveIdc < ERROR_CON_DISABLE)) {
+    WelsLog (& (pCtx.sLogCtx), WELS_LOG_WARNING,
+             "eErrorConMethod (%d) not in range: (%d - %d). Set as default value: (%d).", pCtx.pParam->eEcActiveIdc,
              ERROR_CON_DISABLE, ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE,
              ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
-    pCtx->pParam->eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
+    pCtx.pParam->eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   }
 
-  if (pCtx->pParam->bParseOnly) //parse only, disable EC method
-    pCtx->pParam->eEcActiveIdc = ERROR_CON_DISABLE;
+  if (pCtx.pParam->bParseOnly) //parse only, disable EC method
+    pCtx.pParam->eEcActiveIdc = ERROR_CON_DISABLE;
   InitErrorCon (pCtx);
 
-  if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
-      VIDEO_BITSTREAM_AVC == pCtx->pParam->sVideoProperty.eVideoBsType) {
-    pCtx->eVideoType = pCtx->pParam->sVideoProperty.eVideoBsType;
+  if (VIDEO_BITSTREAM_SVC == pCtx.pParam->sVideoProperty.eVideoBsType ||
+      VIDEO_BITSTREAM_AVC == pCtx.pParam->sVideoProperty.eVideoBsType) {
+    pCtx.eVideoType = pCtx.pParam->sVideoProperty.eVideoBsType;
   } else {
-    pCtx->eVideoType = VIDEO_BITSTREAM_DEFAULT;
+    pCtx.eVideoType = VIDEO_BITSTREAM_DEFAULT;
   }
 
-  WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "eVideoType: %d", pCtx->eVideoType);
+  WelsLog (& (pCtx.sLogCtx), WELS_LOG_INFO, "eVideoType: %d", pCtx.eVideoType);
 
   return ERR_NONE;
 }
@@ -476,11 +476,7 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  * \note    N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
-  if (pCtx == NULL) {
-    return ERR_INFO_INVALID_PTR;
-  }
-
+int32_t WelsInitDecoder (SWelsDecoderContext& pCtx, SLogContext* pLogCtx) {
   // open decoder
   return WelsOpenDecoder (pCtx, pLogCtx);
 }
@@ -496,18 +492,18 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
  * \note    N/A
  *************************************************************************************
  */
-void WelsEndDecoder (PWelsDecoderContext pCtx) {
+void WelsEndDecoder (SWelsDecoderContext& pCtx) {
   // close decoder
   WelsCloseDecoder (pCtx);
 }
 
-void GetVclNalTemporalId (PWelsDecoderContext pCtx) {
-  PAccessUnit pAccessUnit = pCtx->pAccessUnitList;
+void GetVclNalTemporalId (SWelsDecoderContext& pCtx) {
+  PAccessUnit pAccessUnit = pCtx.pAccessUnitList;
   int32_t idx = pAccessUnit->uiStartPos;
 
-  pCtx->iFeedbackVclNalInAu = FEEDBACK_VCL_NAL;
-  pCtx->iFeedbackTidInAu    = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.uiTemporalId;
-  pCtx->iFeedbackNalRefIdc  = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc;
+  pCtx.iFeedbackVclNalInAu = FEEDBACK_VCL_NAL;
+  pCtx.iFeedbackTidInAu    = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.uiTemporalId;
+  pCtx.iFeedbackNalRefIdc  = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc;
 }
 
 /*!
@@ -526,10 +522,10 @@ void GetVclNalTemporalId (PWelsDecoderContext pCtx) {
  * \note    N/A
  *************************************************************************************
  */
-int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
+int32_t WelsDecodeBs (SWelsDecoderContext& pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
                       uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo) {
-  if (!pCtx->bEndOfStreamFlag) {
-    SDataBuffer* pRawData   = &pCtx->sRawData;
+  if (!pCtx.bEndOfStreamFlag) {
+    SDataBuffer* pRawData   = &pCtx.sRawData;
     SDataBuffer* pSavedData = NULL;
 
     int32_t iSrcIdx        = 0; //the index of source bit-stream till now after parsing one or more NALs
@@ -547,7 +543,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
     if (NULL == DetectStartCodePrefix (kpBsBuf, &iOffset,
                                        kiBsLen)) {  //CAN'T find the 00 00 01 start prefix from the source buffer
-      pCtx->iErrorCode |= dsBitstreamError;
+      pCtx.iErrorCode |= dsBitstreamError;
       return dsBitstreamError;
     }
 
@@ -558,8 +554,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       pRawData->pCurPos = pRawData->pHead;
     }
 
-    if (pCtx->pParam->bParseOnly) {
-      pSavedData = &pCtx->sSavedData;
+    if (pCtx.pParam->bParseOnly) {
+      pSavedData = &pCtx.sSavedData;
       if ((kiBsLen + 4) > (pSavedData->pEnd - pSavedData->pCurPos)) {
         pSavedData->pCurPos = pSavedData->pHead;
       }
@@ -573,21 +569,21 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     while (iSrcConsumed < iSrcLength) {
       if ((2 + iSrcConsumed < iSrcLength) && (0 == LD16 (pSrcNal + iSrcIdx)) && (pSrcNal[2 + iSrcIdx] <= 0x03)) {
         if (bNalStartBytes && (pSrcNal[2 + iSrcIdx] != 0x00 && pSrcNal[2 + iSrcIdx] != 0x01)) {
-          pCtx->iErrorCode |= dsBitstreamError;
-          return pCtx->iErrorCode;
+          pCtx.iErrorCode |= dsBitstreamError;
+          return pCtx.iErrorCode;
         }
 
         if (pSrcNal[2 + iSrcIdx] == 0x02) {
-          pCtx->iErrorCode |= dsBitstreamError;
-          return pCtx->iErrorCode;
+          pCtx.iErrorCode |= dsBitstreamError;
+          return pCtx.iErrorCode;
         } else if (pSrcNal[2 + iSrcIdx] == 0x00) {
           pDstNal[iDstIdx++] = pSrcNal[iSrcIdx++];
           iSrcConsumed++;
           bNalStartBytes = true;
         } else if (pSrcNal[2 + iSrcIdx] == 0x03) {
           if ((3 + iSrcConsumed < iSrcLength) && pSrcNal[3 + iSrcIdx] > 0x03) {
-            pCtx->iErrorCode |= dsBitstreamError;
-            return pCtx->iErrorCode;
+            pCtx.iErrorCode |= dsBitstreamError;
+            return pCtx.iErrorCode;
           } else {
             ST16 (pDstNal + iDstIdx, 0);
             iDstIdx      += 2;
@@ -600,38 +596,38 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           iConsumedBytes = 0;
           pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
                                0; // set 4 reserved bytes to zero
-          pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
+          pNalPayload = ParseNalHeader (pCtx, &pCtx.sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
           if (pNalPayload) { //parse correct
-            if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
+            if (IS_PARAM_SETS_NALS (pCtx.sCurNalHead.eNalUnitType)) {
               iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
             }
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
-            if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
+            if (pCtx.bAuReadyFlag && pCtx.pAccessUnitList->uiAvailUnitsNum != 0) {
               ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
             }
           }
           DecodeFinishUpdate (pCtx);
 
-          if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
+          if ((dsOutOfMemory | dsNoParamSets) & pCtx.iErrorCode) {
 #ifdef LONG_TERM_REF
-            pCtx->bParamSetsLostFlag = true;
+            pCtx.bParamSetsLostFlag = true;
 #else
-            pCtx->bReferenceLostAtT0Flag = true;
+            pCtx.bReferenceLostAtT0Flag = true;
 #endif
-            if (dsOutOfMemory & pCtx->iErrorCode) {
-              return pCtx->iErrorCode;
+            if (dsOutOfMemory & pCtx.iErrorCode) {
+              return pCtx.iErrorCode;
             }
           }
           if (iRet) {
             iRet = 0;
-            if (dsNoParamSets & pCtx->iErrorCode) {
+            if (dsNoParamSets & pCtx.iErrorCode) {
 #ifdef LONG_TERM_REF
-              pCtx->bParamSetsLostFlag = true;
+              pCtx.bParamSetsLostFlag = true;
 #else
-              pCtx->bReferenceLostAtT0Flag = true;
+              pCtx.bReferenceLostAtT0Flag = true;
 #endif
             }
-            return pCtx->iErrorCode;
+            return pCtx.iErrorCode;
           }
 
           pDstNal += (iDstIdx + 4); //init, increase 4 reserved zero bytes, used to store the next NAL
@@ -658,61 +654,61 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     pDstNal[iDstIdx] = pDstNal[iDstIdx + 1] = pDstNal[iDstIdx + 2] = pDstNal[iDstIdx + 3] =
                          0; // set 4 reserved bytes to zero
     pRawData->pCurPos = pDstNal + iDstIdx + 4; //init, increase 4 reserved zero bytes, used to store the next NAL
-    pNalPayload = ParseNalHeader (pCtx, &pCtx->sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
+    pNalPayload = ParseNalHeader (pCtx, &pCtx.sCurNalHead, pDstNal, iDstIdx, pSrcNal - 3, iSrcIdx + 3, &iConsumedBytes);
     if (pNalPayload) { //parse correct
-      if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
+      if (IS_PARAM_SETS_NALS (pCtx.sCurNalHead.eNalUnitType)) {
         iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
       }
       CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
-      if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
+      if (pCtx.bAuReadyFlag && pCtx.pAccessUnitList->uiAvailUnitsNum != 0) {
         ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
       }
     }
     DecodeFinishUpdate (pCtx);
 
-    if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
+    if ((dsOutOfMemory | dsNoParamSets) & pCtx.iErrorCode) {
 #ifdef LONG_TERM_REF
-      pCtx->bParamSetsLostFlag = true;
+      pCtx.bParamSetsLostFlag = true;
 #else
-      pCtx->bReferenceLostAtT0Flag = true;
+      pCtx.bReferenceLostAtT0Flag = true;
 #endif
-      return pCtx->iErrorCode;
+      return pCtx.iErrorCode;
     }
     if (iRet) {
       iRet = 0;
-      if (dsNoParamSets & pCtx->iErrorCode) {
+      if (dsNoParamSets & pCtx.iErrorCode) {
 #ifdef LONG_TERM_REF
-        pCtx->bParamSetsLostFlag = true;
+        pCtx.bParamSetsLostFlag = true;
 #else
-        pCtx->bReferenceLostAtT0Flag = true;
+        pCtx.bReferenceLostAtT0Flag = true;
 #endif
       }
-      return pCtx->iErrorCode;
+      return pCtx.iErrorCode;
     }
   } else { /* no supplementary picture payload input, but stored a picture */
     PAccessUnit pCurAu =
-      pCtx->pAccessUnitList; // current access unit, it will never point to NULL after decode's successful initialization
+      pCtx.pAccessUnitList; // current access unit, it will never point to NULL after decode's successful initialization
 
     if (pCurAu->uiAvailUnitsNum == 0) {
-      return pCtx->iErrorCode;
+      return pCtx.iErrorCode;
     } else {
-      pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
+      pCtx.pAccessUnitList->uiEndPos = pCtx.pAccessUnitList->uiAvailUnitsNum - 1;
 
       ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
     }
     DecodeFinishUpdate (pCtx);
 
-    if ((dsOutOfMemory | dsNoParamSets) & pCtx->iErrorCode) {
+    if ((dsOutOfMemory | dsNoParamSets) & pCtx.iErrorCode) {
 #ifdef LONG_TERM_REF
-      pCtx->bParamSetsLostFlag = true;
+      pCtx.bParamSetsLostFlag = true;
 #else
-      pCtx->bReferenceLostAtT0Flag = true;
+      pCtx.bReferenceLostAtT0Flag = true;
 #endif
-      return pCtx->iErrorCode;
+      return pCtx.iErrorCode;
     }
   }
 
-  return pCtx->iErrorCode;
+  return pCtx.iErrorCode;
 }
 
 /*!
@@ -724,7 +720,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
  * \pram    iMbHeight   MB height
  * \return  0 - successful; none 0 - something wrong
  */
-int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
+int32_t SyncPictureResolutionExt (SWelsDecoderContext& pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight) {
   int32_t iErr = ERR_NONE;
   const int32_t kiPicWidth    = kiMbWidth << 4;
   const int32_t kiPicHeight   = kiMbHeight << 4;
@@ -732,33 +728,33 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   bool bReallocFlag = false;
   iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight, bReallocFlag); // common memory used
   if (ERR_NONE != iErr) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
+    WelsLog (& (pCtx.sLogCtx), WELS_LOG_ERROR,
              "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.");
-    pCtx->iErrorCode |= dsOutOfMemory;
+    pCtx.iErrorCode |= dsOutOfMemory;
     return iErr;
   }
 
   iErr = InitialDqLayersContext (pCtx, kiPicWidth, kiPicHeight);
   if (ERR_NONE != iErr) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
+    WelsLog (& (pCtx.sLogCtx), WELS_LOG_ERROR,
              "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.");
-    pCtx->iErrorCode |= dsOutOfMemory;
+    pCtx.iErrorCode |= dsOutOfMemory;
   }
 #if defined(MEMORY_MONITOR)
   if (bReallocFlag) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "SyncPictureResolutionExt(), overall memory usage: %llu bytes",
-             static_cast<unsigned long long> (sizeof (SWelsDecoderContext) + pCtx->pMemAlign->WelsGetMemoryUsage()));
+    WelsLog (& (pCtx.sLogCtx), WELS_LOG_INFO, "SyncPictureResolutionExt(), overall memory usage: %llu bytes",
+             static_cast<unsigned long long> (sizeof (SWelsDecoderContext) + pCtx.pMemAlign->WelsGetMemoryUsage()));
   }
 #endif//MEMORY_MONITOR
   return iErr;
 }
 
-void InitDecFuncs (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
-  WelsBlockFuncInit (&pCtx->sBlockFunc, uiCpuFlag);
+void InitDecFuncs (SWelsDecoderContext& pCtx, uint32_t uiCpuFlag) {
+  WelsBlockFuncInit (&pCtx.sBlockFunc, uiCpuFlag);
   InitPredFunc (pCtx, uiCpuFlag);
-  InitMcFunc (& (pCtx->sMcFunc), uiCpuFlag);
-  InitExpandPictureFunc (& (pCtx->sExpandPicFunc), uiCpuFlag);
-  DeblockingInit (&pCtx->sDeblockingFunc, uiCpuFlag);
+  InitMcFunc (& (pCtx.sMcFunc), uiCpuFlag);
+  InitExpandPictureFunc (& (pCtx.sExpandPicFunc), uiCpuFlag);
+  DeblockingInit (&pCtx.sDeblockingFunc, uiCpuFlag);
 }
 
 namespace {
@@ -777,151 +773,151 @@ void IdctFourResAddPred_ (uint8_t* pPred, int32_t iStride, int16_t* pRs, const i
 
 } // anon ns
 
-void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_V     ] = WelsI16x16LumaPredV_c;
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_H     ] = WelsI16x16LumaPredH_c;
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC    ] = WelsI16x16LumaPredDc_c;
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_P     ] = WelsI16x16LumaPredPlane_c;
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_L  ] = WelsI16x16LumaPredDcLeft_c;
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsI16x16LumaPredDcTop_c;
-  pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsI16x16LumaPredDcNA_c;
+void InitPredFunc (SWelsDecoderContext& pCtx, uint32_t uiCpuFlag) {
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_V     ] = WelsI16x16LumaPredV_c;
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_H     ] = WelsI16x16LumaPredH_c;
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC    ] = WelsI16x16LumaPredDc_c;
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_P     ] = WelsI16x16LumaPredPlane_c;
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_L  ] = WelsI16x16LumaPredDcLeft_c;
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsI16x16LumaPredDcTop_c;
+  pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsI16x16LumaPredDcNA_c;
 
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_V     ] = WelsI4x4LumaPredV_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_H     ] = WelsI4x4LumaPredH_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DC    ] = WelsI4x4LumaPredDc_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DC_L  ] = WelsI4x4LumaPredDcLeft_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DC_T  ] = WelsI4x4LumaPredDcTop_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DC_128] = WelsI4x4LumaPredDcNA_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL    ] = WelsI4x4LumaPredDDL_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL_TOP] = WelsI4x4LumaPredDDLTop_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDR    ] = WelsI4x4LumaPredDDR_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL    ] = WelsI4x4LumaPredVL_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL_TOP] = WelsI4x4LumaPredVLTop_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR    ] = WelsI4x4LumaPredVR_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU    ] = WelsI4x4LumaPredHU_c;
-  pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD    ] = WelsI4x4LumaPredHD_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_V     ] = WelsI4x4LumaPredV_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_H     ] = WelsI4x4LumaPredH_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DC    ] = WelsI4x4LumaPredDc_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DC_L  ] = WelsI4x4LumaPredDcLeft_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DC_T  ] = WelsI4x4LumaPredDcTop_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DC_128] = WelsI4x4LumaPredDcNA_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDL    ] = WelsI4x4LumaPredDDL_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDL_TOP] = WelsI4x4LumaPredDDLTop_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDR    ] = WelsI4x4LumaPredDDR_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_VL    ] = WelsI4x4LumaPredVL_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_VL_TOP] = WelsI4x4LumaPredVLTop_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_VR    ] = WelsI4x4LumaPredVR_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_HU    ] = WelsI4x4LumaPredHU_c;
+  pCtx.pGetI4x4LumaPredFunc[I4_PRED_HD    ] = WelsI4x4LumaPredHD_c;
 
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_V     ] = WelsI8x8LumaPredV_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_H     ] = WelsI8x8LumaPredH_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC    ] = WelsI8x8LumaPredDc_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC_L  ] = WelsI8x8LumaPredDcLeft_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC_T  ] = WelsI8x8LumaPredDcTop_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DC_128] = WelsI8x8LumaPredDcNA_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DDL    ] = WelsI8x8LumaPredDDL_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DDL_TOP] = WelsI8x8LumaPredDDLTop_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_DDR    ] = WelsI8x8LumaPredDDR_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_VL    ] = WelsI8x8LumaPredVL_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_VL_TOP] = WelsI8x8LumaPredVLTop_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_VR    ] = WelsI8x8LumaPredVR_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_HU    ] = WelsI8x8LumaPredHU_c;
-  pCtx->pGetI8x8LumaPredFunc[I4_PRED_HD    ] = WelsI8x8LumaPredHD_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_V     ] = WelsI8x8LumaPredV_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_H     ] = WelsI8x8LumaPredH_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DC    ] = WelsI8x8LumaPredDc_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DC_L  ] = WelsI8x8LumaPredDcLeft_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DC_T  ] = WelsI8x8LumaPredDcTop_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DC_128] = WelsI8x8LumaPredDcNA_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DDL    ] = WelsI8x8LumaPredDDL_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DDL_TOP] = WelsI8x8LumaPredDDLTop_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_DDR    ] = WelsI8x8LumaPredDDR_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_VL    ] = WelsI8x8LumaPredVL_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_VL_TOP] = WelsI8x8LumaPredVLTop_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_VR    ] = WelsI8x8LumaPredVR_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_HU    ] = WelsI8x8LumaPredHU_c;
+  pCtx.pGetI8x8LumaPredFunc[I4_PRED_HD    ] = WelsI8x8LumaPredHD_c;
 
-  pCtx->pGetIChromaPredFunc[C_PRED_DC    ] = WelsIChromaPredDc_c;
-  pCtx->pGetIChromaPredFunc[C_PRED_H     ] = WelsIChromaPredH_c;
-  pCtx->pGetIChromaPredFunc[C_PRED_V     ] = WelsIChromaPredV_c;
-  pCtx->pGetIChromaPredFunc[C_PRED_P     ] = WelsIChromaPredPlane_c;
-  pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsIChromaPredDcLeft_c;
-  pCtx->pGetIChromaPredFunc[C_PRED_DC_T  ] = WelsIChromaPredDcTop_c;
-  pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_DC    ] = WelsIChromaPredDc_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_H     ] = WelsIChromaPredH_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_V     ] = WelsIChromaPredV_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_P     ] = WelsIChromaPredPlane_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsIChromaPredDcLeft_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_DC_T  ] = WelsIChromaPredDcTop_c;
+  pCtx.pGetIChromaPredFunc[C_PRED_DC_128] = WelsIChromaPredDcNA_c;
 
-  pCtx->pIdctResAddPredFunc     = IdctResAddPred_c;
-  pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_c>;
+  pCtx.pIdctResAddPredFunc     = IdctResAddPred_c;
+  pCtx.pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_c>;
 
-  pCtx->pIdctResAddPredFunc8x8  = IdctResAddPred8x8_c;
+  pCtx.pIdctResAddPredFunc8x8  = IdctResAddPred8x8_c;
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pCtx->pIdctResAddPredFunc   = IdctResAddPred_neon;
-    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_neon>;
+    pCtx.pIdctResAddPredFunc   = IdctResAddPred_neon;
+    pCtx.pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_neon>;
 
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_neon;
 
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_V    ] = WelsDecoderI4x4LumaPredV_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_H    ] = WelsDecoderI4x4LumaPredH_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL  ] = WelsDecoderI4x4LumaPredDDL_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDR  ] = WelsDecoderI4x4LumaPredDDR_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL   ] = WelsDecoderI4x4LumaPredVL_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR   ] = WelsDecoderI4x4LumaPredVR_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU   ] = WelsDecoderI4x4LumaPredHU_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD   ] = WelsDecoderI4x4LumaPredHD_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_V    ] = WelsDecoderI4x4LumaPredV_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_H    ] = WelsDecoderI4x4LumaPredH_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDL  ] = WelsDecoderI4x4LumaPredDDL_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDR  ] = WelsDecoderI4x4LumaPredDDR_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VL   ] = WelsDecoderI4x4LumaPredVL_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VR   ] = WelsDecoderI4x4LumaPredVR_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_HU   ] = WelsDecoderI4x4LumaPredHU_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_HD   ] = WelsDecoderI4x4LumaPredHD_neon;
 
-    pCtx->pGetIChromaPredFunc[C_PRED_H]       = WelsDecoderIChromaPredH_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_V]       = WelsDecoderIChromaPredV_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_H]       = WelsDecoderIChromaPredH_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_V]       = WelsDecoderIChromaPredV_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_neon;
   }
 #endif//HAVE_NEON
 
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pCtx->pIdctResAddPredFunc   = IdctResAddPred_AArch64_neon;
-    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_AArch64_neon>;
+    pCtx.pIdctResAddPredFunc   = IdctResAddPred_AArch64_neon;
+    pCtx.pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_AArch64_neon>;
 
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_AArch64_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_AArch64_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_AArch64_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_AArch64_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_L]  = WelsDecoderI16x16LumaPredDcLeft_AArch64_neon;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_T]  = WelsDecoderI16x16LumaPredDcTop_AArch64_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_AArch64_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_AArch64_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_AArch64_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_AArch64_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_L]  = WelsDecoderI16x16LumaPredDcLeft_AArch64_neon;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_T]  = WelsDecoderI16x16LumaPredDcTop_AArch64_neon;
 
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_H    ] = WelsDecoderI4x4LumaPredH_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL  ] = WelsDecoderI4x4LumaPredDDL_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL_TOP] = WelsDecoderI4x4LumaPredDDLTop_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL   ] = WelsDecoderI4x4LumaPredVL_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL_TOP ] = WelsDecoderI4x4LumaPredVLTop_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR   ] = WelsDecoderI4x4LumaPredVR_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU   ] = WelsDecoderI4x4LumaPredHU_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD   ] = WelsDecoderI4x4LumaPredHD_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DC   ] = WelsDecoderI4x4LumaPredDc_AArch64_neon;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DC_T   ] = WelsDecoderI4x4LumaPredDcTop_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_H    ] = WelsDecoderI4x4LumaPredH_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDL  ] = WelsDecoderI4x4LumaPredDDL_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDL_TOP] = WelsDecoderI4x4LumaPredDDLTop_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VL   ] = WelsDecoderI4x4LumaPredVL_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VL_TOP ] = WelsDecoderI4x4LumaPredVLTop_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VR   ] = WelsDecoderI4x4LumaPredVR_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_HU   ] = WelsDecoderI4x4LumaPredHU_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_HD   ] = WelsDecoderI4x4LumaPredHD_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DC   ] = WelsDecoderI4x4LumaPredDc_AArch64_neon;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DC_T   ] = WelsDecoderI4x4LumaPredDcTop_AArch64_neon;
 
-    pCtx->pGetIChromaPredFunc[C_PRED_H]       = WelsDecoderIChromaPredH_AArch64_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_V]       = WelsDecoderIChromaPredV_AArch64_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_AArch64_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_AArch64_neon;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_T]      = WelsDecoderIChromaPredDcTop_AArch64_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_H]       = WelsDecoderIChromaPredH_AArch64_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_V]       = WelsDecoderIChromaPredV_AArch64_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_AArch64_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_AArch64_neon;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC_T]      = WelsDecoderIChromaPredDcTop_AArch64_neon;
   }
 #endif//HAVE_NEON_AARCH64
 
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_MMXEXT) {
-    pCtx->pIdctResAddPredFunc   = IdctResAddPred_mmx;
-    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_mmx>;
+    pCtx.pIdctResAddPredFunc   = IdctResAddPred_mmx;
+    pCtx.pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_mmx>;
 
     ///////mmx code opt---
-    pCtx->pGetIChromaPredFunc[C_PRED_H]      = WelsDecoderIChromaPredH_mmx;
-    pCtx->pGetIChromaPredFunc[C_PRED_V]      = WelsDecoderIChromaPredV_mmx;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsDecoderIChromaPredDcLeft_mmx;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_128] = WelsDecoderIChromaPredDcNA_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDR]  = WelsDecoderI4x4LumaPredDDR_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HD ]  = WelsDecoderI4x4LumaPredHD_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_HU ]  = WelsDecoderI4x4LumaPredHU_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VR ]  = WelsDecoderI4x4LumaPredVR_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_DDL]  = WelsDecoderI4x4LumaPredDDL_mmx;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_VL ]  = WelsDecoderI4x4LumaPredVL_mmx;
+    pCtx.pGetIChromaPredFunc[C_PRED_H]      = WelsDecoderIChromaPredH_mmx;
+    pCtx.pGetIChromaPredFunc[C_PRED_V]      = WelsDecoderIChromaPredV_mmx;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC_L  ] = WelsDecoderIChromaPredDcLeft_mmx;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC_128] = WelsDecoderIChromaPredDcNA_mmx;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDR]  = WelsDecoderI4x4LumaPredDDR_mmx;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_HD ]  = WelsDecoderI4x4LumaPredHD_mmx;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_HU ]  = WelsDecoderI4x4LumaPredHU_mmx;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VR ]  = WelsDecoderI4x4LumaPredVR_mmx;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_DDL]  = WelsDecoderI4x4LumaPredDDL_mmx;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_VL ]  = WelsDecoderI4x4LumaPredVL_mmx;
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    pCtx->pIdctResAddPredFunc     = IdctResAddPred_sse2;
-    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_sse2>;
+    pCtx.pIdctResAddPredFunc     = IdctResAddPred_sse2;
+    pCtx.pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_sse2>;
 
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsDecoderI16x16LumaPredDcTop_sse2;
-    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsDecoderI16x16LumaPredDcNA_sse2;
-    pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_sse2;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_sse2;
-    pCtx->pGetIChromaPredFunc[C_PRED_DC_T]    = WelsDecoderIChromaPredDcTop_sse2;
-    pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_sse2;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_sse2;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_sse2;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_sse2;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_sse2;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsDecoderI16x16LumaPredDcTop_sse2;
+    pCtx.pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsDecoderI16x16LumaPredDcNA_sse2;
+    pCtx.pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_sse2;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_sse2;
+    pCtx.pGetIChromaPredFunc[C_PRED_DC_T]    = WelsDecoderIChromaPredDcTop_sse2;
+    pCtx.pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_sse2;
   }
 #if defined(HAVE_AVX2)
   if (uiCpuFlag & WELS_CPU_AVX2) {
-    pCtx->pIdctResAddPredFunc     = IdctResAddPred_avx2;
-    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_avx2;
+    pCtx.pIdctResAddPredFunc     = IdctResAddPred_avx2;
+    pCtx.pIdctFourResAddPredFunc = IdctFourResAddPred_avx2;
   }
 #endif
 
@@ -954,10 +950,10 @@ void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecSt
 }
 
 //update information when no freezing occurs, including QP, correct IDR number, ECed IDR number
-void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
-  PDqLayer pCurDq = pCtx->pCurDqLayer;
-  PPicture pPic = pCtx->pDec;
-  SDecoderStatistics* pDecStat = &pCtx->sDecoderStatistics;
+void UpdateDecStatNoFreezingInfo (SWelsDecoderContext& pCtx) {
+  PDqLayer pCurDq = pCtx.pCurDqLayer;
+  PPicture pPic = pCtx.pDec;
+  SDecoderStatistics* pDecStat = &pCtx.sDecoderStatistics;
 
   if (pDecStat->iAvgLumaQp == -1) //first correct frame received
     pDecStat->iAvgLumaQp = 0;
@@ -965,7 +961,7 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
   //update QP info
   int32_t iTotalQp = 0;
   const int32_t kiMbNum = pCurDq->iMbWidth * pCurDq->iMbHeight;
-  if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) { //all correct
+  if (pCtx.pParam->eEcActiveIdc == ERROR_CON_DISABLE) { //all correct
     for (int32_t iMb = 0; iMb < kiMbNum; ++iMb) {
       iTotalQp += pCurDq->pLumaQp[iMb];
     }
@@ -991,15 +987,15 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
   //update IDR number
   if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag) {
     pDecStat->uiIDRCorrectNum += (pPic->bIsComplete);
-    if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE)
+    if (pCtx.pParam->eEcActiveIdc != ERROR_CON_DISABLE)
       pDecStat->uiEcIDRNum += (!pPic->bIsComplete);
   }
 }
 
 //update decoder statistics information
-void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput) {
-  if (pCtx->bFreezeOutput)
-    UpdateDecStatFreezingInfo (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag, &pCtx->sDecoderStatistics);
+void UpdateDecStat (SWelsDecoderContext& pCtx, const bool kbOutput) {
+  if (pCtx.bFreezeOutput)
+    UpdateDecStatFreezingInfo (pCtx.pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag, &pCtx.sDecoderStatistics);
   else if (kbOutput)
     UpdateDecStatNoFreezingInfo (pCtx);
 }

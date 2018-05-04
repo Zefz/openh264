@@ -372,7 +372,7 @@ int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* 
   uint8_t* pEnc       = pMbCache->SPicData.pEncMb[0];
   int32_t iLineSizeDec = pCurDqLayer->iCsStride[0];
   int32_t iLineSizeEnc = pCurDqLayer->iEncStride[0];
-  int32_t i, iCurCost, iCurMode, iBestMode, iBestCost = INT_MAX;
+  int32_t i, iCurCost, iCurMode, iBestMode, iBestCost = std::numeric_limits<int32_t>::max();
 
   int32_t iOffset = pMbCache->uiNeighborIntra & 0x07;
   iAvailCount = g_kiIntra16AvaliMode[iOffset][4];
@@ -468,7 +468,7 @@ int32_t WelsMdI4x4 (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
     kpAvailMode = g_kiIntra4AvailMode[kiOffset];
 
     //step 4: gain the best pred mode
-    iBestCost = INT_MAX;
+    iBestCost = std::numeric_limits<int32_t>::max();
     iBestMode = kpAvailMode[0];
 
     if (pFunc->sSampleDealingFuncs.pfIntra4x4Combined3 && (iAvailCount >= 6)) {
@@ -817,7 +817,7 @@ int32_t WelsMdI4x4Fast (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMb
         }
       }
     } else {
-      iBestCost = INT_MAX;
+      iBestCost = std::numeric_limits<int32_t>::max();
       iBestMode = I4_PRED_INVALID;
       for (j = 0; j < iAvailCount; j++) {
         // I4x4_MODE_CHECK(pAvailMode[j], iCurCost);
@@ -877,7 +877,7 @@ int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCa
   const int32_t kiLineSizeEnc   = pCurDqLayer->iEncStride[1];
   const int32_t kiLineSizeDec   = pCurDqLayer->iCsStride[1];//pMbCache->SPicData.i_stride_dec[1];
 
-  int32_t i, iCurMode, iCurCost, iBestMode, iBestCost = INT_MAX;
+  int32_t i, iCurMode, iCurCost, iBestMode, iBestCost = std::numeric_limits<int32_t>::max();
 
   int32_t iOffset = pMbCache->uiNeighborIntra & 0x07;
   iAvailCount = g_kiIntraChromaAvailMode[iOffset][4];

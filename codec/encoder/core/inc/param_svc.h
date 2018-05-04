@@ -73,7 +73,7 @@ static inline uint32_t GetLogFactor (float base, float upper) {
   if (dLog2factor < dRound + dEpsilon && dRound < dLog2factor + dEpsilon) {
     return (uint32_t) (dRound);
   }
-  return UINT_MAX;
+  return std::numeric_limits<uint32_t>::max();
 }
 
 /*
@@ -491,7 +491,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     while (i < iSpatialLayerNum) {
       const uint32_t kuiLogFactorInOutRate = GetLogFactor (pDlp->fOutputFrameRate, pDlp->fInputFrameRate);
       const uint32_t kuiLogFactorMaxInRate = GetLogFactor (pDlp->fInputFrameRate, fMaxFrameRate);
-      if (UINT_MAX == kuiLogFactorInOutRate || UINT_MAX == kuiLogFactorMaxInRate) {
+      if (std::numeric_limits<uint32_t>::max() == kuiLogFactorInOutRate || std::numeric_limits<uint32_t>::max() == kuiLogFactorMaxInRate) {
         return ENC_RETURN_INVALIDINPUT;
       }
       int32_t iNotCodedMask = 0;

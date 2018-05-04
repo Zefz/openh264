@@ -711,7 +711,7 @@ int32_t RequestScreenBlockFeatureStorage (const int32_t kiFrameWidth,  const int
   pScreenBlockFeatureStorage->iIs16x16 = !bIsBlock8x8;
   pScreenBlockFeatureStorage->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
   pScreenBlockFeatureStorage->iActualListSize = kiListSize;
-  WelsSetMemMultiplebytes_c (pScreenBlockFeatureStorage->uiSadCostThreshold, UINT_MAX, BLOCK_SIZE_ALL, sizeof (uint32_t));
+  WelsSetMemMultiplebytes_c (pScreenBlockFeatureStorage->uiSadCostThreshold, std::numeric_limits<uint32_t>::max(), BLOCK_SIZE_ALL, sizeof (uint32_t));
   pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = false;
 
   return ENC_RETURN_SUCCESS;
@@ -879,7 +879,7 @@ void PerformFMEPreprocess (SWelsFuncPtrList* pFunc, SPicture* pRef, uint16_t* pF
     pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x8] = (uiSadCostThreshold16x16 >> 2);
     pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_16x8]
       = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_8x16]
-        = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_4x4] = UINT_MAX;
+        = pScreenBlockFeatureStorage->uiSadCostThreshold[BLOCK_4x4] = std::numeric_limits<uint32_t>::max();
   }
 }
 
@@ -1073,7 +1073,7 @@ void WelsDiamondCrossFeatureSearch (SWelsFuncPtrList* pFunc, SWelsME* pMe, SSlic
   if (pMe->uiSadCost >= pMe->uiSadCostThreshold) {
     pSlice->uiSliceFMECostDown += pMe->uiSadCost;
 
-    uint32_t uiMaxSearchPoint = INT_MAX;//TODO: change it according to computational-complexity setting
+    uint32_t uiMaxSearchPoint = std::numeric_limits<int32_t>::max();//TODO: change it according to computational-complexity setting
     SFeatureSearchIn sFeatureSearchIn = {0};
     if (SetFeatureSearchIn (pFunc, *pMe, pSlice, pMe->pRefFeatureStorage,
                             kiEncStride, kiRefStride,

@@ -42,9 +42,9 @@
 #ifndef WELSVP_VAACALCULATION_H
 #define WELSVP_VAACALCULATION_H
 
+#include <Strategy.hpp>
 #include "util.h"
 #include "memory.h"
-#include "WelsFrameWork.h"
 #include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN

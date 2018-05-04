@@ -51,23 +51,27 @@
 #include "typedef.h"
 #include "memory.h"
 #include "IWelsVP.h"
+#include "wels_common_defs.h"
+#include "wels_const_common.h"
 
 WELSVP_NAMESPACE_BEGIN
 
 #define MAX_MBS_PER_FRAME 36864 //in accordance with max level support in Rec
 
-#define MB_WIDTH_LUMA  (16)
+//#define MB_WIDTH_LUMA  (16)
 #define PESN               (1e-6)       // desired float precision
 #define AQ_INT_MULTIPLY                   10000000
 #define AQ_TIME_INT_MULTIPLY                   10000
 #define AQ_QSTEP_INT_MULTIPLY                   100
 #define AQ_PESN 10 // (1e-6)*AQ_INT_MULTIPLY
 
+/*
 #define MB_TYPE_INTRA4x4                0x00000001
 #define MB_TYPE_INTRA16x16              0x00000002
 #define MB_TYPE_INTRA_PCM               0x00000004
 #define MB_TYPE_INTRA                     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM)
 #define IS_INTRA(type) ((type)&MB_TYPE_INTRA)
+ */
 
 #define WELS_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define WELS_MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -86,7 +90,6 @@ WELSVP_NAMESPACE_BEGIN
 
 #define WelsCastFromPointer(p)      (reinterpret_cast<intptr_t>(p))
 #define WelsStaticCast(type, p)  (static_cast<type>(p))
-#define WelsDynamicCast(type, p) (dynamic_cast<type>(p))
 
 #define GET_METHOD(x)  ((x) & 0xff)          // mask method as the lowest 8bits
 #define GET_SPECIAL(x) (((x) >> 8) & 0xff)   // mask special flag as 8bits

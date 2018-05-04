@@ -39,92 +39,58 @@
  *************************************************************************************
  */
 
-#ifndef WELSVP_WELSFRAMEWORK_H
-#define WELSVP_WELSFRAMEWORK_H
+#pragma once
 
-#include "IWelsVP.h"
-#include "util.h"
-#include "WelsThreadLib.h"
+#include <Strategy.hpp>
+#include "../scenechangedetection/SceneChangeDetection.h"
+#include "../downsample/downsample.h"
+#include "../vaacalc/vaacalculation.h"
+#include "../backgrounddetection/BackgroundDetection.h"
+#include "../adaptivequantization/AdaptiveQuantization.h"
+#include "../complexityanalysis/ComplexityAnalysis.h"
+#include "../imagerotate/imagerotate.h"
+#include "../scrolldetection/ScrollDetection.h"
+#include "../denoise/denoise.h"
 
 WELSVP_NAMESPACE_BEGIN
 
-EResult CreateSpecificVpInterface (IWelsVP** ppCtx);
-EResult DestroySpecificVpInterface (IWelsVP* pCtx);
-
-EResult CreateSpecificVpInterface (IWelsVPc** ppCtx);
-EResult DestroySpecificVpInterface (IWelsVPc* pCtx);
-
-#define MAX_STRATEGY_NUM (METHOD_MASK - 1)
-
-class IStrategy : public IWelsVP {
- public:
-  IStrategy() {
-    m_eMethod  = METHOD_NULL;
-    m_eFormat  = VIDEO_FORMAT_I420;
-    m_iIndex   = 0;
-    m_bInit    = false;
-  }
-
-  virtual ~IStrategy() {}
-
- public:
-  virtual EResult Init (int32_t iType, void* pCfg)  {
-    return RET_SUCCESS;
-  }
-  virtual EResult Uninit (int32_t iType)              {
-    return RET_SUCCESS;
-  }
-  virtual EResult Flush (int32_t iType)               {
-    return RET_SUCCESS;
-  }
-  virtual EResult Get (int32_t iType, void* pParam) {
-    return RET_SUCCESS;
-  }
-  virtual EResult Set (int32_t iType, void* pParam) {
-    return RET_SUCCESS;
-  }
-  virtual EResult SpecialFeature (int32_t iType, void* pIn, void* pOut) {
-    return RET_SUCCESS;
-  }
-  virtual EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst) = 0;
-
- public:
-  EMethods       m_eMethod;
-  EVideoFormat m_eFormat;
-  int32_t           m_iIndex;
-  bool            m_bInit;
-};
-
 class CVpFrameWork : public IWelsVP {
  public:
-  CVpFrameWork (uint32_t uiThreadsNum, EResult& ret);
-  ~CVpFrameWork();
+  CVpFrameWork();
+  ~CVpFrameWork() override;
 
  public:
-  EResult Init (int32_t iType, void* pCfg);
+  EResult Init (int32_t iType, void* pCfg) override;
 
-  EResult Uninit (int32_t iType);
+  EResult Uninit (int32_t iType) override;
 
-  EResult Flush (int32_t iType);
+  EResult Flush (int32_t iType) override;
 
-  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst);
+  EResult Process (int32_t iType, SPixMap* pSrc, SPixMap* pDst) override;
 
-  EResult Get (int32_t iType, void* pParam);
+  EResult Get (int32_t iType, void* pParam) override;
 
-  EResult Set (int32_t iType, void* pParam);
+  EResult Set (int32_t iType, void* pParam) override;
 
-  EResult SpecialFeature (int32_t iType, void* pIn, void* pOut);
+  EResult SpecialFeature (int32_t iType, void* pIn, void* pOut) override;
 
  private:
   bool  CheckValid (EMethods eMethod, SPixMap& sSrc, SPixMap& sDst);
-  IStrategy* CreateStrategy (EMethods eMethod, int32_t iCpuFlag);
 
- private:
-  IStrategy* m_pStgChain[MAX_STRATEGY_NUM];
+  IStrategy* getStrategy(const EMethods eMethod);
 
-  WELS_MUTEX m_mutes;
+private:
+   CSceneChangeDetection<WelsVP::CSceneChangeDetectorVideo> _sceneChangeDetectorVideo;
+   CSceneChangeDetection<CSceneChangeDetectorScreen> _sceneChangeDetectorScreen;
+   CDownsampling _downsampling;
+   CVAACalculation _vaaCalculation;
+   CBackgroundDetection _backgroundDetection;
+   CAdaptiveQuantization _adaptiveQuantization;
+   CComplexityAnalysis _complexityAnalysis;
+   CComplexityAnalysisScreen _complexityAnalysisScreen;
+   CImageRotating _rotating;
+   CScrollDetection _scrollDetection;
+   CDenoiser _denoiser;
 };
 
 WELSVP_NAMESPACE_END
-
-#endif

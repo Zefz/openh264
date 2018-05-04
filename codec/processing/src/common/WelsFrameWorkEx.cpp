@@ -60,37 +60,5 @@ EResult SpecialFeature (void* pCtx, int32_t iType, void* pIn, void* pOut) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EResult CreateSpecificVpInterface (IWelsVPc** pCtx) {
-  EResult  ret     = RET_FAILED;
-  IWelsVP* pWelsVP = NULL;
-
-  ret = CreateSpecificVpInterface (&pWelsVP);
-  if (ret == RET_SUCCESS) {
-    IWelsVPc* pVPc = new IWelsVPc;
-    if (pVPc) {
-      pVPc->Init    = Init;
-      pVPc->Uninit  = Uninit;
-      pVPc->Flush   = Flush;
-      pVPc->Process = Process;
-      pVPc->Get     = Get;
-      pVPc->Set     = Set;
-      pVPc->SpecialFeature = SpecialFeature;
-      pVPc->pCtx       = WelsStaticCast (void*, pWelsVP);
-      *pCtx            = pVPc;
-    } else
-      ret = RET_OUTOFMEMORY;
-  }
-
-  return ret;
-}
-
-EResult DestroySpecificVpInterface (IWelsVPc* pCtx) {
-  if (pCtx) {
-    DestroySpecificVpInterface (WelsStaticCast (IWelsVP*, pCtx->pCtx));
-    delete pCtx;
-  }
-
-  return RET_SUCCESS;
-}
 
 WELSVP_NAMESPACE_END

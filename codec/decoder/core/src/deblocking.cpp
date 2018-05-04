@@ -871,15 +871,15 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
  *
  * \return  NONE
  */
-void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb) {
-  PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
+void WelsDeblockingFilterSlice (SWelsDecoderContext &pCtx, PDeblockingFilterMbFunc pDeblockMb) {
+  PDqLayer pCurDqLayer = pCtx.pCurDqLayer;
   PSliceHeaderExt pSliceHeaderExt = &pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt;
   int32_t iMbWidth  = pCurDqLayer->iMbWidth;
   int32_t iTotalMbCount = pSliceHeaderExt->sSliceHeader.pSps->uiTotalMbCount;
 
   SDeblockingFilter pFilter;
   memset (&pFilter, 0, sizeof (pFilter));
-  PFmo pFmo = pCtx->pFmo;
+  PFmo pFmo = pCtx.pFmo;
   int32_t iNextMbXyIndex = 0;
   int32_t iTotalNumMb = pCurDqLayer->sLayerInfo.sSliceInLayer.iTotalMbInCurSlice;
   int32_t iCountNumMb = 0;
@@ -887,19 +887,19 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
   int32_t iFilterIdc = pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc;
 
   /* Step1: parameters set */
-  pFilter.pCsData[0] = pCtx->pDec->pData[0];
-  pFilter.pCsData[1] = pCtx->pDec->pData[1];
-  pFilter.pCsData[2] = pCtx->pDec->pData[2];
+  pFilter.pCsData[0] = pCtx.pDec->pData[0];
+  pFilter.pCsData[1] = pCtx.pDec->pData[1];
+  pFilter.pCsData[2] = pCtx.pDec->pData[2];
 
-  pFilter.iCsStride[0] = pCtx->pDec->iLinesize[0];
-  pFilter.iCsStride[1] = pCtx->pDec->iLinesize[1];
+  pFilter.iCsStride[0] = pCtx.pDec->iLinesize[0];
+  pFilter.iCsStride[1] = pCtx.pDec->iLinesize[1];
 
   pFilter.eSliceType = (EWelsSliceType) pCurDqLayer->sLayerInfo.sSliceInLayer.eSliceType;
 
   pFilter.iSliceAlphaC0Offset = pSliceHeaderExt->sSliceHeader.iSliceAlphaC0Offset;
   pFilter.iSliceBetaOffset     = pSliceHeaderExt->sSliceHeader.iSliceBetaOffset;
 
-  pFilter.pLoopf = &pCtx->sDeblockingFunc;
+  pFilter.pLoopf = &pCtx.sDeblockingFunc;
 
   /* Step2: macroblock deblocking */
   if (0 == iFilterIdc || 2 == iFilterIdc) {

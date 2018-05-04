@@ -52,12 +52,12 @@ extern "C" {
 /*!
  * \brief   configure decoder parameters
  */
-int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam);
+int32_t DecoderConfigParam (SWelsDecoderContext& pCtx, const SDecodingParam* kpParam);
 
 /*!
  * \brief   fill in default values of decoder context
  */
-void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
+void WelsDecoderDefaults (SWelsDecoderContext& pCtx, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************
@@ -73,7 +73,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
  * \note    N/A
  *************************************************************************************
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
+int32_t WelsInitDecoder (SWelsDecoderContext& pCtx, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************
@@ -86,7 +86,7 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
  * \note    N/A
  *************************************************************************************
  */
-void WelsEndDecoder (PWelsDecoderContext pCtx);
+void WelsEndDecoder (SWelsDecoderContext& pCtx);
 
 /*!
  *************************************************************************************
@@ -105,19 +105,19 @@ void WelsEndDecoder (PWelsDecoderContext pCtx);
  *************************************************************************************
  */
 
-int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
+int32_t WelsDecodeBs (SWelsDecoderContext& pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
                       uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo);
 
 /*
  *  request memory blocks for decoder avc part
  */
-int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight, bool& bReallocFlag);
+int32_t WelsRequestMem (SWelsDecoderContext& pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight, bool& bReallocFlag);
 
 
 /*
  *  free memory dynamically allocated during decoder
  */
-void WelsFreeDynamicMemory (PWelsDecoderContext pCtx);
+void WelsFreeDynamicMemory (SWelsDecoderContext& pCtx);
 
 /*!
  * \brief   make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
@@ -128,23 +128,23 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx);
  * \pram    iMbHeight   MB height
  * \return  0 - successful; none 0 - something wrong
  */
-int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
+int32_t SyncPictureResolutionExt (SWelsDecoderContext& pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
 /*!
  * \brief   init decoder predictive function pointers including ASM functions during MB reconstruction
  * \param   pCtx        Wels decoder context
  * \param   uiCpuFlag   cpu assembly indication
  */
-void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag);
+void InitPredFunc (SWelsDecoderContext& pCtx, uint32_t uiCpuFlag);
 
 /*!
  * \brief   init decoder internal function pointers including ASM functions
  * \param   pCtx        Wels decoder context
  * \param   uiCpuFlag   cpu assembly indication
  */
-void InitDecFuncs (PWelsDecoderContext pCtx, uint32_t uiCpuFlag);
+void InitDecFuncs (SWelsDecoderContext& pCtx, uint32_t uiCpuFlag);
 
-void GetVclNalTemporalId (PWelsDecoderContext pCtx); //get the info that whether or not have VCL NAL in current AU,
+void GetVclNalTemporalId (SWelsDecoderContext& pCtx); //get the info that whether or not have VCL NAL in current AU,
 //and if YES, get the temporal ID
 
 //reset decoder number related statistics info
@@ -152,9 +152,9 @@ void ResetDecStatNums (SDecoderStatistics* pDecStat);
 //update information when freezing occurs, including IDR/non-IDR number
 void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecStat);
 //update information when no freezing occurs, including QP, correct IDR number, ECed IDR number
-void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx);
+void UpdateDecStatNoFreezingInfo (SWelsDecoderContext& pCtx);
 //update decoder statistics information
-void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput);
+void UpdateDecStat (SWelsDecoderContext& pCtx, const bool kbOutput);
 #ifdef __cplusplus
 }
 #endif//__cplusplus

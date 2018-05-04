@@ -40,7 +40,7 @@
 #ifdef ONLY_ENC_FRAMES_NUM
 #undef ONLY_ENC_FRAMES_NUM
 #endif//ONLY_ENC_FRAMES_NUM
-#define ONLY_ENC_FRAMES_NUM INT_MAX // 2, INT_MAX // type the num you try to encode here, 2, 10, etc
+#define ONLY_ENC_FRAMES_NUM std::numeric_limits<int32_t>::max() // 2, INT_MAX // type the num you try to encode here, 2, 10, etc
 
 //#define STICK_STREAM_SIZE
 
@@ -358,29 +358,31 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.fMaxFrameRate  = 30.0f;                // input frame rate
   sParam.iPicWidth      = 320;                 // width of picture in samples
   sParam.iPicHeight     = 240;                  // height of picture in samples
-  sParam.iTargetBitrate = 1000000;              // target bitrate desired
-  sParam.iMaxBitrate    = UNSPECIFIED_BIT_RATE;
+  sParam.iTargetBitrate = 256000;              // target bitrate desired
+  sParam.iMaxBitrate    = 256000;
   sParam.iRCMode        = RC_QUALITY_MODE;      //  rc mode control
   sParam.iTemporalLayerNum = 3;    // layer number at temporal level
   sParam.iSpatialLayerNum  = 1;    // layer number at spatial level
+  sParam.bIsLosslessLink = false;
+  sParam.iEntropyCodingModeFlag = 1; //prefer CABAC (sacrifice decode computation for better compression)
   sParam.bEnableDenoise    = false;    // denoise control
   sParam.bEnableBackgroundDetection = true; // background detection control
   sParam.bEnableAdaptiveQuant       = true; // adaptive quantization control
-  sParam.bEnableFrameSkip           = true; // frame skipping
+  sParam.bEnableFrameSkip           = false; // frame skipping
   sParam.bEnableLongTermReference   = false; // long term reference control
   sParam.iLtrMarkPeriod = 30;
   sParam.uiIntraPeriod  = 320;           // period of Intra frame
   sParam.eSpsPpsIdStrategy = INCREASING_ID;
   sParam.bPrefixNalAddingCtrl = false;
-  sParam.iComplexityMode = LOW_COMPLEXITY;
+  sParam.iComplexityMode = HIGH_COMPLEXITY;
   sParam.bSimulcastAVC         = false;
 
-  sParam.sSpatialLayers[0].uiProfileIdc       = PRO_SCALABLE_BASELINE;
+  sParam.sSpatialLayers[0].uiProfileIdc       = PRO_EXTENDED;
   sParam.sSpatialLayers[0].iVideoWidth        = 320;
   sParam.sSpatialLayers[0].iVideoHeight       = 240;
   sParam.sSpatialLayers[0].fFrameRate         = 25.0f;
-  sParam.sSpatialLayers[0].iSpatialBitrate    = 1000000;
-  sParam.sSpatialLayers[0].iMaxSpatialBitrate    = UNSPECIFIED_BIT_RATE;
+  sParam.sSpatialLayers[0].iSpatialBitrate    = 256000;
+  sParam.sSpatialLayers[0].iMaxSpatialBitrate    = 256000;
   sParam.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
   sParam.sSpatialLayers[0].sSliceArgument.uiSliceNum = 1;
 

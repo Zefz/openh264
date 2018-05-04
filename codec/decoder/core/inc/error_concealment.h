@@ -44,22 +44,22 @@
 
 namespace WelsDec {
 //Initialize error concealment
-void InitErrorCon (PWelsDecoderContext pCtx);
+void InitErrorCon (SWelsDecoderContext& pCtx);
 //Do error concealment using frame copy method
-void DoErrorConFrameCopy (PWelsDecoderContext pCtx);
+void DoErrorConFrameCopy (SWelsDecoderContext& pCtx);
 //Do error concealment using slice copy method
-void DoErrorConSliceCopy (PWelsDecoderContext pCtx);
+void DoErrorConSliceCopy (SWelsDecoderContext& pCtx);
 //Do error concealment using slice MV copy method
-void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32_t iMbXy, int32_t iMbX, int32_t iMbY, sMCRefMember* pMCRefMem, int32_t iCurrPoc);
-void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx);
-void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx);
+void DoMbECMvCopy (SWelsDecoderContext& pCtx, PPicture pDec, PPicture pRef, int32_t iMbXy, int32_t iMbX, int32_t iMbY, sMCRefMember* pMCRefMem, int32_t iCurrPoc);
+void GetAvilInfoFromCorrectMb (SWelsDecoderContext& pCtx);
+void DoErrorConSliceMVCopy (SWelsDecoderContext& pCtx);
 //Mark erroneous frame as Ref Pic into DPB
-int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx);
+int32_t MarkECFrameAsRef (SWelsDecoderContext& pCtx);
 //Judge if EC is needed to current frame
-bool NeedErrorCon (PWelsDecoderContext pCtx);
+bool NeedErrorCon (SWelsDecoderContext& pCtx);
 // ImplementErrorConceal
 // Do actual error concealment
-void ImplementErrorCon (PWelsDecoderContext pCtx);
+void ImplementErrorCon (SWelsDecoderContext& pCtx);
 
 } // namespace WelsDec
 

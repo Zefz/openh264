@@ -83,21 +83,21 @@ uint8_t* DetectStartCodePrefix (const uint8_t* kpBuf, int32_t* pOffset, int32_t 
  * \note    N/A
  *************************************************************************************
  */
-uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeader, uint8_t* pSrcRbsp,
+uint8_t* ParseNalHeader (SWelsDecoderContext& pCtx, SNalUnitHeader* pNalUnitHeader, uint8_t* pSrcRbsp,
                          int32_t iSrcRbspLen, uint8_t* pSrcNal, int32_t iSrcNalLen, int32_t* pConsumedBytes);
 
-int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t kiSrcLen, uint8_t* pSrcNal,
+int32_t ParseNonVclNal (SWelsDecoderContext& pCtx, uint8_t* pRbsp, const int32_t kiSrcLen, uint8_t* pSrcNal,
                         const int32_t kSrcNalLen);
 
 int32_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePicMarking);
 
-int32_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs);
+int32_t ParsePrefixNalUnit (SWelsDecoderContext& pCtx, PBitStringAux pBs);
 
-bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PNalUnit kpLastNal,
+bool CheckAccessUnitBoundary (SWelsDecoderContext& pCtx, const PNalUnit kpCurNal, const PNalUnit kpLastNal,
                               const PSps kpSps);
 bool CheckAccessUnitBoundaryExt (PNalUnitHeaderExt pLastNalHdrExt, PNalUnitHeaderExt pCurNalHeaderExt,
                                  PSliceHeader pLastSliceHeader, PSliceHeader pCurSliceHeader);
-bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PSps kpSps);
+bool CheckNextAuNewSeq (SWelsDecoderContext& pCtx, const PNalUnit kpCurNal, const PSps kpSps);
 
 /*!
  *************************************************************************************
@@ -114,7 +114,7 @@ bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const
  * \note    Call it in case eNalUnitType is SPS.
  *************************************************************************************
  */
-int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicWidth, int32_t* pPicHeight,
+int32_t ParseSps (SWelsDecoderContext& pCtx, PBitStringAux pBsAux, int32_t* pPicWidth, int32_t* pPicHeight,
                   uint8_t* pSrcNal, const int32_t kSrcNalLen);
 
 /*!
@@ -131,7 +131,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
  * \note    Call it in case eNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux, uint8_t* pSrcNal,
+int32_t ParsePps (SWelsDecoderContext& pCtx, PPps pPpsList, PBitStringAux pBsAux, uint8_t* pSrcNal,
                   const int32_t kSrcNalLen);
 
 /*!
@@ -148,7 +148,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
 * \note    Call it in case the flag "vui_parameters_present_flag" in sps is true.
 *************************************************************************************
 */
-int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux);
+int32_t ParseVui (SWelsDecoderContext& pCtx, PSps pSps, PBitStringAux pBsAux);
 
 /*!
  *************************************************************************************
@@ -191,7 +191,7 @@ int32_t ParseSei (void* pSei, PBitStringAux pBsAux); // reserved Sei_Msg type
  * \return  count number of fmo context units are reset
  *************************************************************************************
  */
-int32_t ResetFmoList (PWelsDecoderContext pCtx);
+int32_t ResetFmoList (SWelsDecoderContext& pCtx);
 
 } // namespace WelsDec
 

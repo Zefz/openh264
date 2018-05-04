@@ -43,7 +43,6 @@
 
 #include "util.h"
 #include "memory.h"
-#include "WelsFrameWork.h"
 #include "IWelsVP.h"
 #include "sad_common.h"
 #include "intra_pred_common.h"

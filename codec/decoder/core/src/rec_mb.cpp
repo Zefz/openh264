@@ -44,8 +44,8 @@
 
 namespace WelsDec {
 
-void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer pCurLayer) {
-  PPicture pCurPic = pCtx->pDec;
+void WelsFillRecNeededMbInfo (SWelsDecoderContext& pCtx, bool bOutput, PDqLayer pCurLayer) {
+  PPicture pCurPic = pCtx.pDec;
   int32_t iLumaStride   = pCurPic->iLinesize[0];
   int32_t iChromaStride = pCurPic->iLinesize[1];
   int32_t iMbX = pCurLayer->iMbX;
@@ -61,25 +61,25 @@ void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer p
   }
 }
 
-int32_t RecI8x8Mb (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+int32_t RecI8x8Mb (int32_t iMbXy, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   RecI8x8Luma (iMbXy, pCtx, pScoeffLevel, pDqLayer);
   RecI4x4Chroma (iMbXy, pCtx, pScoeffLevel, pDqLayer);
   return ERR_NONE;
 }
 
-int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+int32_t RecI8x8Luma (int32_t iMbXy, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   /*****get local variable from outer variable********/
   /*prediction info*/
   uint8_t* pPred = pDqLayer->pPred[0];
 
   int32_t iLumaStride = pDqLayer->iLumaStride;
-  int32_t* pBlockOffset = pCtx->iDecBlockOffsetArray;
-  PGetIntraPred8x8Func* pGetI8x8LumaPredFunc = pCtx->pGetI8x8LumaPredFunc;
+  int32_t* pBlockOffset = pCtx.iDecBlockOffsetArray;
+  PGetIntraPred8x8Func* pGetI8x8LumaPredFunc = pCtx.pGetI8x8LumaPredFunc;
 
   int8_t* pIntra8x8PredMode = pDqLayer->pIntra4x4FinalMode[iMbXy]; // I_NxN
   int16_t* pRS = pScoeffLevel;
   /*itransform info*/
-  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc8x8;
+  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx.pIdctResAddPredFunc8x8;
 
   /*************local variable********************/
   uint8_t i = 0;
@@ -114,26 +114,26 @@ int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   return ERR_NONE;
 }
 
-int32_t RecI4x4Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+int32_t RecI4x4Mb (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   RecI4x4Luma (iMBXY, pCtx, pScoeffLevel, pDqLayer);
   RecI4x4Chroma (iMBXY, pCtx, pScoeffLevel, pDqLayer);
   return ERR_NONE;
 }
 
 
-int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+int32_t RecI4x4Luma (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   /*****get local variable from outer variable********/
   /*prediction info*/
   uint8_t* pPred = pDqLayer->pPred[0];
 
   int32_t iLumaStride = pDqLayer->iLumaStride;
-  int32_t* pBlockOffset = pCtx->iDecBlockOffsetArray;
-  PGetIntraPredFunc* pGetI4x4LumaPredFunc = pCtx->pGetI4x4LumaPredFunc;
+  int32_t* pBlockOffset = pCtx.iDecBlockOffsetArray;
+  PGetIntraPredFunc* pGetI4x4LumaPredFunc = pCtx.pGetI4x4LumaPredFunc;
 
   int8_t* pIntra4x4PredMode = pDqLayer->pIntra4x4FinalMode[iMBXY];
   int16_t* pRS = pScoeffLevel;
   /*itransform info*/
-  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
+  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx.pIdctResAddPredFunc;
 
 
   /*************local variable********************/
@@ -157,12 +157,12 @@ int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 }
 
 
-int32_t RecI4x4Chroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
-  int32_t iChromaStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
+int32_t RecI4x4Chroma (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+  int32_t iChromaStride = pCtx.pCurDqLayer->pDec->iLinesize[1];
 
   int8_t iChromaPredMode = pDqLayer->pChromaPredMode[iMBXY];
 
-  PGetIntraPredFunc* pGetIChromaPredFunc = pCtx->pGetIChromaPredFunc;
+  PGetIntraPredFunc* pGetIChromaPredFunc = pCtx.pGetIChromaPredFunc;
 
   uint8_t* pPred = pDqLayer->pPred[1];
 
@@ -176,13 +176,13 @@ int32_t RecI4x4Chroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeff
 }
 
 
-int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+int32_t RecI16x16Mb (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   /*decoder use, encoder no use*/
   int8_t iI16x16PredMode = pDqLayer->pIntraPredMode[iMBXY][7];
   int8_t iChromaPredMode = pDqLayer->pChromaPredMode[iMBXY];
-  PGetIntraPredFunc* pGetIChromaPredFunc = pCtx->pGetIChromaPredFunc;
-  PGetIntraPredFunc* pGetI16x16LumaPredFunc = pCtx->pGetI16x16LumaPredFunc;
-  int32_t iUVStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
+  PGetIntraPredFunc* pGetIChromaPredFunc = pCtx.pGetIChromaPredFunc;
+  PGetIntraPredFunc* pGetI16x16LumaPredFunc = pCtx.pGetI16x16LumaPredFunc;
+  int32_t iUVStride = pCtx.pCurDqLayer->pDec->iLinesize[1];
 
   /*common use by decoder&encoder*/
   int32_t iYStride = pDqLayer->iLumaStride;
@@ -190,7 +190,7 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 
   uint8_t* pPred = pDqLayer->pPred[0];
 
-  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx->pIdctFourResAddPredFunc;
+  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx.pIdctFourResAddPredFunc;
 
   /*decode i16x16 y*/
   pGetI16x16LumaPredFunc[iI16x16PredMode] (pPred, iYStride);
@@ -214,12 +214,12 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 
 
 //according to current 8*8 block ref_index to gain reference picture
-static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx, int8_t* pRefIdxList,
+static inline void GetRefPic (sMCRefMember* pMCRefMem, SWelsDecoderContext& pCtx, int8_t* pRefIdxList,
                               int32_t iIndex) {
   PPicture pRefPic;
 
   int8_t iRefIdx = pRefIdxList[iIndex];
-  pRefPic = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
+  pRefPic = pCtx.sRefPic.pRefList[LIST_0][iRefIdx];
 
   pMCRefMem->iSrcLineLuma   = pRefPic->iLinesize[0];
   pMCRefMem->iSrcLineChroma = pRefPic->iLinesize[1];
@@ -332,10 +332,10 @@ void WeightPrediction (PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, int32_t iR
 }
 
 
-void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
+void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, SWelsDecoderContext& pCtx) {
   sMCRefMember pMCRefMem;
-  PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
-  SMcFunc* pMCFunc = &pCtx->sMcFunc;
+  PDqLayer pCurDqLayer = pCtx.pCurDqLayer;
+  SMcFunc* pMCFunc = &pCtx.sMcFunc;
 
   int32_t iMBXY = pCurDqLayer->iMbXyIndex;
 
@@ -346,8 +346,8 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   int32_t iMBOffsetX = pCurDqLayer->iMbX << 4;
   int32_t iMBOffsetY = pCurDqLayer->iMbY << 4;
 
-  int32_t iDstLineLuma   = pCtx->pDec->iLinesize[0];
-  int32_t iDstLineChroma = pCtx->pDec->iLinesize[1];
+  int32_t iDstLineLuma   = pCtx.pDec->iLinesize[0];
+  int32_t iDstLineChroma = pCtx.pDec->iLinesize[1];
 
   int32_t iBlk8X, iBlk8Y, iBlk4X, iBlk4Y, i, j, iIIdx, iJIdx;
 
@@ -535,9 +535,9 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   }
 }
 
-int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
-  int32_t iChromaStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
-  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx->pIdctFourResAddPredFunc;
+int32_t RecChroma (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+  int32_t iChromaStride = pCtx.pCurDqLayer->pDec->iLinesize[1];
+  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx.pIdctFourResAddPredFunc;
 
   uint8_t i = 0;
   uint8_t uiCbpC = pDqLayer->pCbp[iMBXY] >> 4;

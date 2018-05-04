@@ -105,7 +105,7 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable,
                                 /*short *tCoeffLevel,*/
                                 int16_t* pTCoeff,
                                 uint8_t uiQp,
-                                PWelsDecoderContext pCtx);
+                                SWelsDecoderContext& pCtx);
 
 // Transform8x8
 int32_t WelsResidualBlockCavlc8x8 (SVlcTable* pVlcTable,
@@ -120,14 +120,14 @@ int32_t WelsResidualBlockCavlc8x8 (SVlcTable* pVlcTable,
                                 int16_t* pTCoeff,
                                 int32_t  iIdx4x4,
                                 uint8_t uiQp,
-                                PWelsDecoderContext pCtx);
+                                SWelsDecoderContext& pCtx);
 
 /*!
  * \brief   parsing inter info (including ref_index and pMvd)
  * \param   input : decoding context, current mb, bit-stream
  * \param   output: 0 indicating decoding correctly; -1 means error
  */
-int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30],
+int32_t ParseInterInfo (SWelsDecoderContext& pCtx, int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30],
                         PBitStringAux pBs);
 
 } // namespace WelsDec

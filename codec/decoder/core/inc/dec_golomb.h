@@ -247,21 +247,21 @@ static inline bool CheckMoreRBSPData(PBitStringAux pBsAux) {
 //define macros to check syntax elements
 #define WELS_CHECK_SE_BOTH_ERROR(val, lower_bound, upper_bound, syntax_name, ret_code) do {\
 if ((val < lower_bound) || (val > upper_bound)) {\
-  WelsLog(&(pCtx->sLogCtx), WELS_LOG_ERROR, "invalid syntax " syntax_name " %d", val);\
+  WelsLog(&(pCtx.sLogCtx), WELS_LOG_ERROR, "invalid syntax " syntax_name " %d", val);\
   return ret_code;\
 }\
 }while(0)
 
 #define WELS_CHECK_SE_LOWER_ERROR(val, lower_bound, syntax_name, ret_code) do {\
 if (val < lower_bound) {\
-  WelsLog(&(pCtx->sLogCtx), WELS_LOG_ERROR, "invalid syntax " syntax_name " %d", val);\
+  WelsLog(&(pCtx.sLogCtx), WELS_LOG_ERROR, "invalid syntax " syntax_name " %d", val);\
   return ret_code;\
 }\
 }while(0)
 
 #define WELS_CHECK_SE_UPPER_ERROR(val, upper_bound, syntax_name, ret_code) do {\
 if (val > upper_bound) {\
-  WelsLog(&(pCtx->sLogCtx), WELS_LOG_ERROR, "invalid syntax " syntax_name " %d", val);\
+  WelsLog(&(pCtx.sLogCtx), WELS_LOG_ERROR, "invalid syntax " syntax_name " %d", val);\
   return ret_code;\
 }\
 }while(0)
@@ -287,19 +287,19 @@ if (val > upper_bound) {\
 
 #define WELS_CHECK_SE_BOTH_WARNING(val, lower_bound, upper_bound, syntax_name) do {\
 if ((val < lower_bound) || (val > upper_bound)) {\
-  WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "invalid syntax " syntax_name " %d", val);\
+  WelsLog(&(pCtx.sLogCtx), WELS_LOG_WARNING, "invalid syntax " syntax_name " %d", val);\
 }\
 }while(0)
 
 #define WELS_CHECK_SE_LOWER_WARNING(val, lower_bound, syntax_name) do {\
 if (val < lower_bound) {\
-  WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "invalid syntax " syntax_name " %d", val);\
+  WelsLog(&(pCtx.sLogCtx), WELS_LOG_WARNING, "invalid syntax " syntax_name " %d", val);\
 }\
 }while(0)
 
 #define WELS_CHECK_SE_UPPER_WARNING(val, upper_bound, syntax_name) do {\
 if (val > upper_bound) {\
-  WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "invalid syntax " syntax_name " %d", val);\
+  WelsLog(&(pCtx.sLogCtx), WELS_LOG_WARNING, "invalid syntax " syntax_name " %d", val);\
 }\
 }while(0)
 // below define syntax element offset

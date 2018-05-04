@@ -117,29 +117,6 @@ CWelsPreProcess::CWelsPreProcess (sWelsEncCtx* pEncCtx) {
 
 CWelsPreProcess::~CWelsPreProcess() {
   FreeScaledPic (&m_sScaledPicture);
-  WelsPreprocessDestroy();
-}
-
-int32_t CWelsPreProcess::WelsPreprocessCreate() {
-  if (m_pInterfaceVp == NULL) {
-    WelsCreateVpInterface ((void**) &m_pInterfaceVp, WELSVP_INTERFACE_VERION);
-    if (!m_pInterfaceVp)
-      goto exit;
-  } else
-    goto exit;
-
-  return 0;
-
-exit:
-  WelsPreprocessDestroy();
-  return 1;
-}
-
-int32_t CWelsPreProcess::WelsPreprocessDestroy() {
-  WelsDestroyVpInterface (m_pInterfaceVp, WELSVP_INTERFACE_VERION);
-  m_pInterfaceVp = NULL;
-
-  return 0;
 }
 
 int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx, int32_t iWidth, int32_t iHeight) {
@@ -220,8 +197,7 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   int32_t iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
 
   if (!m_bInitDone) {
-    if (WelsPreprocessCreate() != 0)
-      return -1;
+    m_pInterfaceVp = &_preprocessor;
 
     if (WelsPreprocessReset (pCtx, iWidth, iHeight) != 0)
       return -1;
@@ -1045,12 +1021,12 @@ void CWelsPreProcessScreen::GetAvailableRefList (SPicture** pSrcPicList, uint8_t
 
 
 void CWelsPreProcessScreen::InitRefJudgement (SRefJudgement* pRefJudgement) {
-  pRefJudgement->iMinFrameComplexity = INT_MAX;
-  pRefJudgement->iMinFrameComplexity08 = INT_MAX;
-  pRefJudgement->iMinFrameComplexity11 = INT_MAX;
+  pRefJudgement->iMinFrameComplexity = std::numeric_limits<int32_t>::max();
+  pRefJudgement->iMinFrameComplexity08 = std::numeric_limits<int32_t>::max();
+  pRefJudgement->iMinFrameComplexity11 = std::numeric_limits<int32_t>::max();
 
-  pRefJudgement->iMinFrameNumGap = INT_MAX;
-  pRefJudgement->iMinFrameQp = INT_MAX;
+  pRefJudgement->iMinFrameNumGap = std::numeric_limits<int32_t>::max();
+  pRefJudgement->iMinFrameQp = std::numeric_limits<int32_t>::max();
 }
 bool CWelsPreProcessScreen::JudgeBestRef (SPicture* pRefPic, const SRefJudgement& sRefJudgement,
     const int64_t iFrameComplexity, const bool bIsClosestLtrFrame) {

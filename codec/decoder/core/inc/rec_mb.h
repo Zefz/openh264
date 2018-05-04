@@ -70,23 +70,23 @@ typedef struct TagMCRefMember {
 void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
                            int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]);
 
-void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer pCurLayer);
+void WelsFillRecNeededMbInfo (SWelsDecoderContext& pCtx, bool bOutput, PDqLayer pCurLayer);
 
-int32_t RecI4x4Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecI4x4Mb (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecI4x4Luma (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-int32_t RecI4x4Chroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecI4x4Chroma (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-int32_t RecI8x8Mb (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecI8x8Mb (int32_t iMbXy, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecI8x8Luma (int32_t iMbXy, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecI16x16Mb (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+int32_t RecChroma (int32_t iMBXY, SWelsDecoderContext& pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
-void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx);
+void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, SWelsDecoderContext& pCtx);
 
 } // namespace WelsDec
 

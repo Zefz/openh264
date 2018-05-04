@@ -34,7 +34,7 @@
 namespace WelsDec {
 static const int16_t g_kMvdBinPos2Ctx [8] = {0, 1, 2, 3, 3, 3, 3, 3};
 
-void WelsCabacGlobalInit (PWelsDecoderContext pCtx) {
+void WelsCabacGlobalInit (SWelsDecoderContext& pCtx) {
   for (int32_t iModel = 0; iModel < 4; iModel++) {
     for (int32_t iQp = 0; iQp <= WELS_QP_MAX; iQp++)
       for (int32_t iIdx = 0; iIdx < WELS_CONTEXT_COUNT; iIdx++) {
@@ -50,20 +50,20 @@ void WelsCabacGlobalInit (PWelsDecoderContext pCtx) {
           uiStateIdx = iPreCtxState - 64;
           uiValMps = 1;
         }
-        pCtx->sWelsCabacContexts[iModel][iQp][iIdx].uiState = uiStateIdx;
-        pCtx->sWelsCabacContexts[iModel][iQp][iIdx].uiMPS = uiValMps;
+        pCtx.sWelsCabacContexts[iModel][iQp][iIdx].uiState = uiStateIdx;
+        pCtx.sWelsCabacContexts[iModel][iQp][iIdx].uiMPS = uiValMps;
       }
   }
-  pCtx->bCabacInited = true;
+  pCtx.bCabacInited = true;
 }
 
 // ------------------- 1. context initialization
-void WelsCabacContextInit (PWelsDecoderContext  pCtx, uint8_t eSliceType, int32_t iCabacInitIdc, int32_t iQp) {
-  int32_t iIdx =  pCtx->eSliceType == WelsCommon::I_SLICE ? 0 : iCabacInitIdc + 1;
-  if (!pCtx->bCabacInited) {
+void WelsCabacContextInit (SWelsDecoderContext& pCtx, uint8_t eSliceType, int32_t iCabacInitIdc, int32_t iQp) {
+  int32_t iIdx =  pCtx.eSliceType == WelsCommon::I_SLICE ? 0 : iCabacInitIdc + 1;
+  if (!pCtx.bCabacInited) {
     WelsCabacGlobalInit (pCtx);
   }
-  memcpy (pCtx->pCabacCtx, pCtx->sWelsCabacContexts[iIdx][iQp],
+  memcpy (pCtx.pCabacCtx, pCtx.sWelsCabacContexts[iIdx][iQp],
           WELS_CONTEXT_COUNT * sizeof (SWelsCabacCtx));
 }
 

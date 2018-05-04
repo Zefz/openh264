@@ -53,11 +53,9 @@ static inline void* WelsMallocz (const uint32_t kuiSize, const char* kpTag) {
     std::cout << "[" << kpTag << "]" << " zMalloc " << kuiSize << " bytes\n";
 #endif
 
-    /*
-    void* result = aligned_alloc(m_nCacheLineSize, kuiSize);
-    memset(result, 0, kuiSize);
-    return result;
-    */
+    //void* result = aligned_alloc(64, kuiSize);
+    //memset(result, 0, kuiSize);
+    //return result;
 
     return calloc(kuiSize, sizeof(uint8_t));
 }

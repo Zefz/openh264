@@ -42,8 +42,8 @@
 #ifndef WELSVP_IMAGEROTATE_H
 #define WELSVP_IMAGEROTATE_H
 
+#include <Strategy.hpp>
 #include "util.h"
-#include "WelsFrameWork.h"
 #include "IWelsVP.h"
 
 WELSVP_NAMESPACE_BEGIN

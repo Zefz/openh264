@@ -39,13 +39,12 @@
  *************************************************************************************
  */
 
-#ifndef WELSVP_DENOISE_H
-#define WELSVP_DENOISE_H
+#pragma once
 
+#include <Strategy.hpp>
+#include "IWelsVP.h"
 #include "util.h"
 #include "memory.h"
-#include "WelsFrameWork.h"
-#include "IWelsVP.h"
 
 
 #define DENOISE_GRAY_RADIUS (1)
@@ -105,5 +104,3 @@ class CDenoiser : public IStrategy {
 };
 
 WELSVP_NAMESPACE_END
-
-#endif

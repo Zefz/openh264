@@ -322,7 +322,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i);
       return ENC_RETURN_INVALIDINPUT;
     }
-    if (UINT_MAX == GetLogFactor (fDlp->fOutputFrameRate, fDlp->fInputFrameRate)) {
+    if (std::numeric_limits<uint32_t>::max() == GetLogFactor (fDlp->fOutputFrameRate, fDlp->fInputFrameRate)) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "AUTO CORRECT: Invalid settings in input frame rate(%.6f) and output frame rate(%.6f) of layer #%d config file: iResult of output frame rate divided by input frame rate should be power of 2(i.e,in/pOut=2^n). \n Auto correcting Output Framerate to Input Framerate %f!\n",
                fDlp->fInputFrameRate, fDlp->fOutputFrameRate, i, fDlp->fInputFrameRate);

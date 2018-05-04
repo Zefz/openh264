@@ -47,10 +47,10 @@
 
 namespace WelsDec {
 
-void  WelsResetRefPic (PWelsDecoderContext pCtx);
-int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc);
-int32_t WelsReorderRefList (PWelsDecoderContext pCtx);
-int32_t WelsMarkAsRef (PWelsDecoderContext pCtx);
+void  WelsResetRefPic (SWelsDecoderContext& pCtx);
+int32_t WelsInitRefList (SWelsDecoderContext& pCtx, int32_t iPoc);
+int32_t WelsReorderRefList (SWelsDecoderContext& pCtx);
+int32_t WelsMarkAsRef (SWelsDecoderContext& pCtx);
 
 } // namespace WelsDec
 

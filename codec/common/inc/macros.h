@@ -37,12 +37,11 @@
  *
  *************************************************************************************
  */
-#ifndef WELS_MACRO_UTILIZATIONS_H__
-#define WELS_MACRO_UTILIZATIONS_H__
+#pragma once
 
-#include <math.h>
-#include <assert.h>
-#include <string.h>
+#include <cmath>
+#include <cassert>
+#include <cstring>
 #include "typedefs.h"
 
 
@@ -322,5 +321,3 @@ inline void WelsSetMemMultiplebytes_c (void* pDst, uint32_t iValue, int32_t iSiz
     memset (static_cast<uint8_t*> (pDst), 0, iSizeOfData * iDataLengthOfData);
   }
 }
-
-#endif//WELS_MACRO_UTILIZATIONS_H__

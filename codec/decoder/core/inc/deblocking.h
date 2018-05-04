@@ -64,7 +64,7 @@ void  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
  *
  * \return  NONE
  */
-void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb);
+void WelsDeblockingFilterSlice (SWelsDecoderContext& pCtx, PDeblockingFilterMbFunc pDeblockMb);
 
 /*!
  * \brief   pixel deblocking filtering

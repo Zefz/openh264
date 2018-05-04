@@ -44,6 +44,7 @@
 #ifndef WELS_PREPROCESS_H
 #define WELS_PREPROCESS_H
 
+#include <WelsFrameWork.h>
 #include "typedefs.h"
 #include "picture.h"
 #include "wels_const.h"
@@ -152,8 +153,6 @@ class CWelsPreProcess {
   int32_t GetCurPicPosition (const int32_t kiDidx);
 
  private:
-  int32_t WelsPreprocessCreate();
-  int32_t WelsPreprocessDestroy();
   int32_t InitLastSpatialPictures (sWelsEncCtx* pEncCtx);
 
  private:
@@ -189,16 +188,19 @@ class CWelsPreProcess {
   SPicture* GetBestRefPic (EUsageType iUsageType, bool bSceneLtr, EWelsSliceType eSliceType, int32_t kiDidx,
                            int32_t iRefTemporalIdx);
   SPicture* GetBestRefPic (const int32_t kiDidx, const int32_t iRefTemporalIdx);
+
  protected:
   IWelsVP*         m_pInterfaceVp;
   sWelsEncCtx*     m_pEncCtx;
   uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
 
  private:
+  WelsVP::CVpFrameWork  _preprocessor;
   Scaled_Picture   m_sScaledPicture;
   SPicture*        m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   bool             m_bInitDone;
   uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
+
  protected:
   /* For Downsampling & VAA I420 based source pictures */
   SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_REF_PIC_COUNT + 1];
